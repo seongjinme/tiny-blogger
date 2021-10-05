@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ post['title'] }} | {% endblock %}
+
+{% block content %}
+  <article class="post">
+    <header>
+      <div>
+        <h2>{{ post['title'] }}</h2>
+        <div class="text-muted">
+          <strong>{{ post['username'] }}</strong> on {{ post['created'].strftime('%Y-%m-%d') }}
+          {% if g.user['id'] == post['user_id'] %}
+            <a role="button" class="btn btn-secondary btn-sm" style="margin-left: 1rem;" href="{{ url_for('blog.edit', slug=post['slug']) }}">Edit</a>
+          {% endif %}
+        </div>
+      </div>
+    </header>
+    <p class="body">
+      {{ post['body']|safe }}
+    </p>
+  </article>
+{% endblock %}

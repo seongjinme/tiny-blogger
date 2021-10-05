@@ -1,0 +1,4 @@
+include blog/db.sql
+graft blog/static
+graft blog/templates
+global-exclude *.pyc

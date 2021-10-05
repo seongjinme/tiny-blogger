@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block title %}HOME | {% endblock %}
+
+{% block header %}
+  {% if query %}
+    <div class="alert alert-light mt-3 mb-4 alert-dismissible">
+      Search results : <strong>{{ query }}</strong>
+      <a href="{{ url_for('blog.index') }}" type="button" class="close" title="Click to clear search results">
+        &times;
+      </a>
+    </div>
+  {% endif %}
+  {% if message %}
+    <div class="alert alert-light mt-3 mb-4 alert-dismissible">
+      {{ message }}
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+    </div>
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+  {% for post in posts %}
+    <article class="post">
+      <header>
+        <h2><a href="{{ url_for('blog.view_post', slug=post['slug']) }}">{{ post['title'] }}</a></h2>
+      </header>
+      <p class="body">
+      {% if posts_truncate %}
+        {{ post['body']|striptags|truncate() }}
+      {% else %}
+        {{ post['body']|safe }}
+      {% endif %}
+      </p>
+      <footer>
+        <div class="text-muted">
+          {{ post['created'].strftime('%Y-%m-%d') }}
+          {% if g.user['id'] == post['user_id'] %}
+            <a role="button" class="btn btn-secondary btn-sm" style="margin-left: 1rem;" href="{{ url_for('blog.edit', slug=post['slug']) }}">Edit</a>
+          {% endif %}
+        </div>
+      </footer>
+    </article>
+    {% if not loop.last %}
+      <hr>
+    {% endif %}
+  {% endfor %}
+
+  <nav id="pagination" class="mt-5 mb-5" style="margin: 0 auto; padding: 0 auto;">
+    <ul class="pagination">
+    {% if page > 1 %}
+      {% if query %}
+        <li class="page-item">
+          <a class="page-link" href="{{ url_for('index', p=page-1, q=query) }}">&laquo;</a>
+        </li>
+      {% else %}
+        <li class="page-item">
+          <a class="page-link" href="{{ url_for('index', p=page-1) }}">&laquo;</a>
+        </li>
+      {% endif %}
+    {% endif %}
+    {% for p in range(p_num_start, p_num_end+1) %}
+      {% if p == page %}
+      <li class="page-item active">
+        <a class="page-link">{{ p }}</a>
+      </li>
+      {% elif query %}
+      <li class="page-item">
+        <a class="page-link" href="{{ url_for('index', p=p, q=query) }}">{{ p }}</a>
+      </li>
+      {% else %}
+      <li class="page-item">
+        <a class="page-link" href="{{ url_for('index', p=p) }}">{{ p }}</a>
+      </li>
+      {% endif %}
+    {% endfor %}
+    {% if page < pages %}
+      {% if query %}
+        <li class="page-item">
+          <a class="page-link" href="{{ url_for('index', p=page+1, q=query) }}">&raquo;</a>
+        </li>
+      {% else %}
+        <li class="page-item">
+          <a class="page-link" href="{{ url_for('index', p=page+1) }}">&raquo;</a>
+        </li>
+      {% endif %}
+    {% endif %}
+    </ul>
+  </nav>
+{% endblock %}

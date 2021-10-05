@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}Register | {% endblock %}
+
+{% block header %}
+{% endblock %}
+
+{% block content %}
+  <form id="register" class="form-group" method="post" style="max-width: 25rem; margin: 0 auto;">
+    <label for="userid" class="mt-3">User ID</label>
+    <input name="userid" id="userid" class="form-control form-control-lg" type="text" required autofocus>
+
+    <label for="username" class="mt-3">Username</label>
+    <input name="username" id="username" class="form-control form-control-lg" type="text" required>
+
+    <label for="password" class="mt-3">Password</label>
+    <input name="password" id="password" class="form-control form-control-lg" type="password" required>
+
+    <label for="password-confirm" class="mt-3">Confirm Password</label>
+    <input name="password-confirm" id="password-confirm" class="form-control form-control-lg" type="password" required>
+
+    <button type="submit" name="submit" id="submit" class="btn btn-primary btn-lg btn-block mt-4" value="Register">Register</button>
+  </form>
+{% endblock %}

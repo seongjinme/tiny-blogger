@@ -1,0 +1,17 @@
+body {
+    font-size: 1rem;
+    line-height: 1.625;
+}
+
+.post {
+    margin: 1rem 0 2rem;
+    word-break: keep-all;
+}
+
+span#post_slug {
+    word-break: break-word;
+}
+
+.body {
+    margin: 1rem 0;
+}
