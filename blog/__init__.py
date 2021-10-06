@@ -28,6 +28,8 @@ def create_app(test_config=None):
     # Initialize the database
     from . import db
     db.init_app(app)
+    with app.app_context():
+        db.init_db()
 
     # Import/register 'auth' blueprint to initialize authentication
     from . import auth
