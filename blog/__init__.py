@@ -35,6 +35,10 @@ def create_app(test_config=None):
     from . import auth
     app.register_blueprint(auth.bp)
 
+    # Import/register 'admin' blueprint
+    from . import admin
+    app.register_blueprint(admin.bp)
+
     # Import/register 'blog' blueprint
     from . import blog
     app.register_blueprint(blog.bp)
