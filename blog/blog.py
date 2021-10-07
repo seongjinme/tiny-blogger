@@ -140,7 +140,7 @@ def create():
             return redirect(url_for('blog.index'))
 
     categories = get_category_list()
-    return render_template('blog/create.html', categories=categories)
+    return render_template('blog/create.html', alarm_type='danger', categories=categories)
 
 
 @bp.route('/<string:slug>/edit', methods=('GET', 'POST'))
@@ -173,7 +173,7 @@ def edit(slug):
             db.commit()
             return redirect(url_for('blog.index'))
 
-    return render_template('blog/edit.html', post=post, category=category, categories=categories)
+    return render_template('blog/edit.html', post=post, alarm_type='danger', category=category, categories=categories)
 
 
 @bp.route('/<string:slug>/delete', methods=('POST',))
