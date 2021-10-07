@@ -69,5 +69,5 @@ function slugify(text) {
 
 function enable_submit() {
     content = document.querySelector('div.note-editable.card-block');
-    submit.disabled = !(title.value && slug.readOnly && slug.value && (content.innerHTML != '<p><br></p>' && content.innerHTML != ''));
+    submit.disabled = !(title.value && slug.readOnly && slug.value && category.options[category.selectedIndex].value && (content.innerHTML != '<p><br></p>' && content.innerHTML != ''));
 }
