@@ -7,7 +7,7 @@ from blog.checker import (
     check_input_error, check_user_exists, check_category_exists
 )
 from blog.getter import (
-    get_post, get_category, get_pagination_ranges, get_posts_per_page, get_posts_per_page_by_search
+    get_post, get_category, get_category_list, get_pagination_ranges, get_posts_per_page, get_posts_per_page_by_search
 )
 from blog.sanitize import sanitize_html
 import re
@@ -23,7 +23,7 @@ def index():
         return redirect(url_for('auth.register'))
 
     # Check if there's at least one category
-    check_category_exists()
+    # check_category_exists()
 
     # Get query keywords and strip
     query = request.args.get('q')
@@ -121,29 +121,34 @@ def create():
     if request.method == 'POST':
         title = request.form['title']
         slug = request.form['slug']
+        category_id = request.form['category']
         body = sanitize_html(request.form['body'])
 
-        error = check_input_error(title, slug, body, None)
+        error = check_input_error(title, slug, body, None, category_id)
 
         if error is not None:
             flash(error)
         else:
             db = get_db()
             db.execute(
-                'INSERT INTO post (title, slug, body, user_id)'
-                ' VALUES (?, ?, ?, ?)',
-                (title, slug, body, g.user['id'])
+                'INSERT INTO post (title, slug, body, user_id, category_id)'
+                ' VALUES (?, ?, ?, ?, ?)',
+                (title, slug, body, g.user['id'], category_id)
             )
             db.commit()
+            flash('Your post has successfully updated!')
             return redirect(url_for('blog.index'))
 
-    return render_template('blog/create.html')
+    categories = get_category_list()
+    return render_template('blog/create.html', categories=categories)
 
 
 @bp.route('/<string:slug>/edit', methods=('GET', 'POST'))
 @login_required
 def edit(slug):
     post = get_post(slug)
+    category = get_category(post['id'])
+    categories = get_category_list(post['category_id'])
 
     if request.method == 'POST':
         slug_before = slug
@@ -152,22 +157,23 @@ def edit(slug):
         slug = request.form['slug']
         body = request.form['body']
         post_id = post['id']
+        category_id = request.form['category']
 
-        error = check_input_error(title, slug, body, post_id)
+        error = check_input_error(title, slug, body, post_id, category_id)
 
         if error is not None:
             flash(error)
         else:
             db = get_db()
             db.execute(
-                'UPDATE post SET title = ?, slug = ?, body = ?'
+                'UPDATE post SET title = ?, slug = ?, category_id = ?, body = ?'
                 ' WHERE slug = ?',
-                (title, slug, body, slug_before)
+                (title, slug, category_id, body, slug_before)
             )
             db.commit()
             return redirect(url_for('blog.index'))
 
-    return render_template('blog/edit.html', post=post)
+    return render_template('blog/edit.html', post=post, category=category, categories=categories)
 
 
 @bp.route('/<string:slug>/delete', methods=('POST',))
