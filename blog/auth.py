@@ -64,6 +64,10 @@ def register():
 
 @bp.route('/login', methods=('GET', 'POST'))
 def login():
+    if session.get('user_id'):
+        flash("You're already logged in!")
+        return redirect(url_for('blog.index'))
+
     if request.method == 'POST':
         userid = request.form['userid']
         password = request.form['password']
