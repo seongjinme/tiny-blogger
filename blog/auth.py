@@ -4,6 +4,7 @@ from flask import (
 )
 from werkzeug.security import check_password_hash, generate_password_hash
 from blog.db import get_db
+from blog.checker import check_category_exists, check_post_exists
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 
@@ -29,21 +30,34 @@ def register():
         if error is None:
             try:
                 db.execute(
-                    "INSERT INTO user (userid, username, password) VALUES (?, ?, ?)",
+                    'INSERT INTO user (userid, username, password) VALUES (?, ?, ?)',
                     (userid, username, generate_password_hash(password)),
                 )
                 db.commit()
 
-            # Check if username is duplicated
+            # Check if userid is duplicated
             except db.IntegrityError:
-                error = f"User ID {userid} is already registered."
+                error = f'User ID {userid} is already registered.'
 
             # If registration is completed, redirect to login page
             else:
-                return redirect(url_for("auth.login"))
+
+                # Check if there's any category exists, and create one if there isn't
+                check_category_exists()
+
+                # Check and create the first post
+                check_post_exists(userid)
+
+                return redirect(url_for('auth.login'))
 
         # Store error message
         flash(error)
+
+    # If registered user exists when someone accesses register page with 'GET' method, redirect to index
+    if get_db().execute('SELECT userid FROM user').fetchone() is not None:
+        error = 'Registered user account already exists.'
+        flash(error)
+        return redirect(url_for("blog.index"))
 
     return render_template('auth/register.html')
 
