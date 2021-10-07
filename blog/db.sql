@@ -22,3 +22,18 @@ CREATE TABLE IF NOT EXISTS category (
     name TEXT UNIQUE NOT NULL,
     slug TEXT UNIQUE NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS setting (
+    blog_title TEXT DEFAULT 'tiny-blogger',
+    blog_about_title TEXT,
+    blog_about_body TEXT,
+    search_allow INTEGER NOT NULL DEFAULT 1,
+    posts_per_page INTEGER NOT NULL DEFAULT 3,
+    posts_truncate INTEGER NOT NULL DEFAULT 1,
+    pagination_size INTEGER NOT NULL DEFAULT 5,
+    cmt_allow TEXT NOT NULL DEFAULT 'Off',
+    cmt_facebook_appid TEXT,
+    cmt_facebook_count INTEGER,
+    cmt_facebook_color TEXT,
+    cmt_disqus_shortname TEXT
+)
