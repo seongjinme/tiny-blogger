@@ -25,9 +25,19 @@
         <button type="button" form="create" name="btn_edit_slug" id="btn_edit_slug" class="btn btn-primary" value="Edit">Edit</button>
       </div>
     </div>
-    <small class="form-text text-muted mb-4">
+    <small class="form-text text-muted">
       {{ url_for('blog.index', _external=True) }}<span id="post_slug">{{ post['slug'] }}</span>
     </small>
+
+    <label for="category" class="mt-3">Category</label>
+    <div class="form-group mb-4">
+      <select name="category" id="category" class="custom-select" required>
+        <option value="{{ category['id'] }}" selected>{{ category['name'] }}</option>
+        {% for c in categories %}
+        <option value="{{ c['id'] }}">{{ c['name'] }}</option>
+        {% endfor %}
+      </select>
+    </div>
 
     <label for="summernote" class="d-none">Body</label>
     <textarea name="body" id="summernote" class="form-control" form="create">{{ request.form['body'] or post['body'] }}</textarea>
