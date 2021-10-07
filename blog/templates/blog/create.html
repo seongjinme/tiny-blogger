@@ -32,7 +32,7 @@
     <label for="category" class="mt-3">Category</label>
     <div class="form-group mb-4">
       <select name="category" id="category" class="custom-select" required>
-        <option selected="">Select category</option>
+        <option value="" selected>Select category</option>
         {% for c in categories %}
         <option value="{{ c['id'] }}">{{ c['name'] }}</option>
         {% endfor %}
@@ -64,5 +64,5 @@
 {% endblock %}
 
 {% block script %}
-  <script src="{{ url_for('static', filename='slugify.js') }}"></script>
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
 {% endblock %}
