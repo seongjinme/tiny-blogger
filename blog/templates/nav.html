@@ -24,11 +24,9 @@
         <div class="dropdown-menu dropdown-menu-right dropdown-menu-sm-left">
           <a class="dropdown-item" href="{{ url_for('blog.create') }}">New Post</a>
           <div class="dropdown-divider"></div>
-          <a class="dropdown-item" href="#">Settings</a>
-          <a class="dropdown-item" href="#">User Info</a>
-          <a class="dropdown-item" href="#">Posts</a>
-          <a class="dropdown-item" href="#">Comments</a>
-          <a class="dropdown-item" href="#">Categories</a>
+          <a class="dropdown-item" href="{{ url_for('admin.settings') }}">Settings</a>
+          <a class="dropdown-item" href="{{ url_for('admin.account') }}">Account</a>
+          <a class="dropdown-item" href="{{ url_for('admin.categories') }}">Categories</a>
           <div class="dropdown-divider"></div>
           <a class="dropdown-item" href="{{ url_for('auth.logout') }}">Logout</a>
         </div>
