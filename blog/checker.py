@@ -14,8 +14,8 @@ def check_category_exists():
     # If there's no category, create default category named "Uncategorized"
     if db.execute('SELECT id FROM category').fetchone() is None:
         db.execute(
-            'INSERT INTO category (name, slug) VALUES (?, ?)',
-            ('Uncategorized', 'uncategorized')
+            'INSERT INTO category (name, slug, c_order) VALUES (?, ?, ?)',
+            ('Uncategorized', 'uncategorized', 1)
         )
         db.commit()
 
