@@ -71,9 +71,14 @@ def get_row_count(query=None):
 
 def get_pagination_ranges(page=None, query=None):
     # Set variables for pagination
-    posts_per_page = 3  # default: 3, min: 1, max: 10
-    pagination_size = 5  # default: 5, min: 3, max: 10
-    posts_truncate = True  # default: True
+    db = get_db()
+    values = db.execute(
+        'SELECT posts_per_page, pagination_size, posts_truncate'
+        ' FROM setting'
+    ).fetchone()
+    posts_per_page = values['posts_per_page']  # default: 3, min: 1, max: 10
+    pagination_size = values['pagination_size']  # default: 5, min: 3, max: 10
+    posts_truncate = True if values['pagination_size'] == 1 else False  # default: True
 
     # Ensure page is higher than 0
     page = 1 if page is None or page <= 1 else page
