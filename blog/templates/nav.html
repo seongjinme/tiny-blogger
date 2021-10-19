@@ -1,5 +1,5 @@
 <nav class="navbar navbar-expand flex-column navbar-dark bg-primary">
-  <a class="navbar-brand" href="{{ url_for('blog.index') }}">Flask-Blogger</a>
+  <a class="navbar-brand" href="{{ url_for('blog.index') }}">{{ blog_title }}</a>
   <div class="navbar-nav-scroll" id="navbarColor01">
     <ul class="navbar-nav mr-auto">
       <li class="nav-item">
@@ -16,7 +16,7 @@
         </div>
       </li>
       <li class="nav-item">
-        <a class="nav-link" role="button" data-toggle="collapse" data-target="#searchbar" aria-controls="searchbar" aria-expanded="false" area-label="Toggle searchbar">Search</a>
+        <a class="nav-link" role="button" data-toggle="collapse" data-target="#searchbar" aria-controls="searchbar" aria-expanded="false">Search</a>
       </li>
       {% if g.user %}
       <li class="nav-item dropdown">
