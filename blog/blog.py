@@ -4,10 +4,10 @@ from flask import (
 from blog.auth import login_required
 from blog.db import get_db
 from blog.checker import (
-    check_input_error, check_user_exists, check_category_exists
+    check_input_valid, check_user_exists, check_category_exists, check_setting_exists
 )
 from blog.getter import (
-    get_post, get_category, get_category_list, get_pagination_ranges, get_posts_per_page, get_posts_per_page_by_search
+    get_blog_title, get_post, get_category, get_category_list, get_pagination_ranges, get_posts_per_page, get_posts_per_page_by_search
 )
 from blog.sanitize import sanitize_html
 import re
@@ -23,7 +23,10 @@ def index():
         return redirect(url_for('auth.register'))
 
     # Check if there's at least one category
-    # check_category_exists()
+    check_category_exists()
+
+    # Check if there are valid setting values
+    check_setting_exists()
 
     # Get query keywords and strip
     query = request.args.get('q')
@@ -69,9 +72,10 @@ def index():
         # Case 1-2 : If there's no result, ignore given page number and render index with a message
         else:
             posts = get_posts_per_page(p['offset'], p['posts_per_page'])
+            query_keyword = query
             query = None
             page = 1
-            error = f'Theres no search results with keyword : {query}'
+            error = f'Theres no search results with keyword : {query_keyword}'
 
     # Case 2 : If there's a 'blank' query, ignore query & page number, and render index with a message
     elif query is not None and query == '':
@@ -104,7 +108,8 @@ def index():
 
     if error:
         flash(error)
-    return render_template('blog/index.html',
+
+    return render_template('blog/index.html', blog_title=get_blog_title(),
                            posts=posts, query=query, alarm_type=alarm_type, page=page, pages=pages,
                            p_num_start=p_num_start, p_num_end=p_num_end, posts_truncate=posts_truncate)
 
@@ -112,7 +117,7 @@ def index():
 @bp.route('/<string:slug>/')
 def view_post(slug):
     post = get_post(slug, False)
-    return render_template('blog/post.html', post=post)
+    return render_template('blog/post.html', blog_title=get_blog_title(), post=post)
 
 
 @bp.route('/create', methods=('GET', 'POST'))
@@ -124,7 +129,7 @@ def create():
         category_id = request.form['category']
         body = sanitize_html(request.form['body'])
 
-        error = check_input_error(title, slug, body, None, category_id)
+        error = check_input_valid(title, slug, body, None, category_id)
 
         if error is not None:
             flash(error)
@@ -140,7 +145,7 @@ def create():
             return redirect(url_for('blog.index'))
 
     categories = get_category_list()
-    return render_template('blog/create.html', alarm_type='danger', categories=categories)
+    return render_template('blog/create.html', blog_title=get_blog_title(), alarm_type='danger', categories=categories)
 
 
 @bp.route('/<string:slug>/edit', methods=('GET', 'POST'))
@@ -159,7 +164,7 @@ def edit(slug):
         post_id = post['id']
         category_id = request.form['category']
 
-        error = check_input_error(title, slug, body, post_id, category_id)
+        error = check_input_valid(title, slug, body, post_id, category_id)
 
         if error is not None:
             flash(error)
@@ -173,7 +178,8 @@ def edit(slug):
             db.commit()
             return redirect(url_for('blog.index'))
 
-    return render_template('blog/edit.html', post=post, alarm_type='danger', category=category, categories=categories)
+    return render_template('blog/edit.html', blog_title=get_blog_title(),
+                           post=post, alarm_type='danger', category=category, categories=categories)
 
 
 @bp.route('/<string:slug>/delete', methods=('POST',))
