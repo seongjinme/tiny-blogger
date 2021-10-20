@@ -43,7 +43,6 @@ def index():
         p = get_pagination_ranges(page)
 
     # Set the rest variables for rendering index with default values
-    alarm_type = 'light'
     pages = p['pages']
     p_num_start = p['pagination_num_start']
     p_num_end = p['pagination_num_end']
@@ -71,6 +70,12 @@ def index():
 
         # Case 1-2 : If there's no result, ignore given page number and render index with a message
         else:
+            p = get_pagination_ranges(1)
+            pages = p['pages']
+            p_num_start = p['pagination_num_start']
+            p_num_end = p['pagination_num_end']
+            posts_truncate = p['posts_truncate']
+
             posts = get_posts_per_page(p['offset'], p['posts_per_page'])
             query_keyword = query
             query = None
@@ -110,7 +115,7 @@ def index():
         flash(error)
 
     return render_template('blog/index.html', blog_title=get_blog_title(),
-                           posts=posts, query=query, alarm_type=alarm_type, page=page, pages=pages,
+                           posts=posts, query=query, page=page, pages=pages,
                            p_num_start=p_num_start, p_num_end=p_num_end, posts_truncate=posts_truncate)
 
 
@@ -176,6 +181,7 @@ def edit(slug):
                 (title, slug, category_id, body, slug_before)
             )
             db.commit()
+            flash('Your post has successfully updated!')
             return redirect(url_for('blog.index'))
 
     return render_template('blog/edit.html', blog_title=get_blog_title(),
