@@ -140,7 +140,7 @@ function remove_edit_event_listener(g) {
 function set_delete_category_contents() {
     const category_id = this.parentElement.id;
     const category_name = this.parentElement.querySelector('span.mr-auto.category_name').textContent;
-    const category_slug = this.parentElement.querySelector('span.d-none.category_slug').textContent;
-
-    document.getElementById('delete_category_name').textContent = category_name;
+    document.getElementById('delete_category_id').value = category_id;
+    document.getElementById('delete_category_name').value = category_name;
+    document.getElementById('delete_category_name_text').textContent = category_name;
 }
