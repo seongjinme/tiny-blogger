@@ -26,7 +26,7 @@
       </div>
     </div>
     <small class="form-text text-muted">
-      {{ url_for('blog.index', _external=True) }}<span id="post_slug">{{ post['slug'] }}</span>
+      {{ url_for('blog.index', _external=True) }}<span id="slug_url">{{ post['slug'] }}</span>
     </small>
 
     <label for="category" class="mt-3">Category</label>
@@ -89,5 +89,6 @@
 {% endblock %}
 
 {% block script %}
-  <script src="{{ url_for('static', filename='script.js') }}"></script>
+  <script type="module" src="{{ url_for('static', filename='script.js') }}"></script>
+  <script type="module" src="{{ url_for('static', filename='post.js') }}"></script>
 {% endblock %}
