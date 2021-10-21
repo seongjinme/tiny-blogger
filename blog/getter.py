@@ -3,6 +3,11 @@ from flask import g
 from werkzeug.exceptions import abort
 
 
+def get_blog_title():
+    value = get_db().execute('SELECT blog_title FROM setting').fetchone()
+    return value['blog_title']
+
+
 def get_post(slug, check_author=True):
     post = get_db().execute(
         'SELECT p.id, slug, title, body, created, user_id, username, category_id'
@@ -76,7 +81,7 @@ def get_pagination_ranges(page=None, query=None):
         'SELECT posts_per_page, pagination_size, posts_truncate'
         ' FROM setting'
     ).fetchone()
-    posts_per_page = values['posts_per_page']  # default: 3, min: 1, max: 10
+    posts_per_page = values['posts_per_page']  # default: 3, min: 1, max: 20
     pagination_size = values['pagination_size']  # default: 5, min: 3, max: 10
     posts_truncate = True if values['pagination_size'] == 1 else False  # default: True
 
@@ -119,8 +124,10 @@ def get_pagination_ranges(page=None, query=None):
 def get_posts_per_page_by_search(query_string, offset, per_page):
     db = get_db()
     return db.execute(
-        'SELECT p.id, title, slug, body, created, user_id, username'
-        ' FROM post p JOIN user u ON p.user_id = u.id'
+        'SELECT p.id, c.name, c.slug c_slug, title, p.slug slug, body, created, user_id, username'
+        ' FROM post p'
+        ' JOIN user u ON p.user_id = u.id'
+        ' JOIN category c ON p.category_id = c.id'
         ' WHERE title LIKE ? OR body LIKE ?'
         ' ORDER BY created DESC'
         ' LIMIT ?, ?',
@@ -131,8 +138,10 @@ def get_posts_per_page_by_search(query_string, offset, per_page):
 def get_posts_per_page(offset, per_page):
     db = get_db()
     return db.execute(
-        'SELECT p.id, title, slug, body, created, user_id, username'
-        ' FROM post p JOIN user u ON p.user_id = u.id'
+        'SELECT p.id, c.name, c.slug c_slug, title, p.slug slug, body, created, user_id, username'
+        ' FROM post p'
+        ' JOIN user u ON p.user_id = u.id'
+        ' JOIN category c ON p.category_id = c.id'
         ' ORDER BY created DESC'
         ' LIMIT ?, ?',
         (offset, per_page,)
