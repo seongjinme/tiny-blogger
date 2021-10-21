@@ -1,3 +1,4 @@
+from werkzeug.security import check_password_hash
 from blog.db import get_db
 import re
 
@@ -16,6 +17,17 @@ def check_category_exists():
         db.execute(
             'INSERT INTO category (name, slug, c_order) VALUES (?, ?, ?)',
             ('Uncategorized', 'uncategorized', 1)
+        )
+        db.commit()
+
+
+def check_setting_exists():
+    db = get_db()
+
+    # If there's no setting values, create and insert default values
+    if db.execute('SELECT * FROM setting').fetchone() is None:
+        db.execute(
+            'INSERT INTO setting DEFAULT VALUES;'
         )
         db.commit()
 
@@ -48,13 +60,35 @@ def check_slug_valid(slug):
     return True
 
 
-def check_slug_not_duplicated(post_id, slug):
+def check_post_slug_not_duplicated(post_id, slug):
     db = get_db()
     count = db.execute(
         'SELECT id, slug FROM post WHERE slug = ?',
         (slug,)
     ).fetchone()
     if count is None or count['id'] == post_id:
+        return True
+    return False
+
+
+def check_category_slug_not_duplicated(slug, category_id=None):
+    db = get_db()
+    count = db.execute(
+        'SELECT id, slug FROM category WHERE slug = ?',
+        (slug,)
+    ).fetchone()
+    if count is None or count['id'] == category_id:
+        return True
+    return False
+
+
+def check_category_name_not_duplicated(name, category_id=None):
+    db = get_db()
+    count = db.execute(
+        'SELECT id, name FROM category WHERE name = ?',
+        (name,)
+    ).fetchone()
+    if count is None or count['id'] == category_id:
         return True
     return False
 
@@ -70,7 +104,7 @@ def check_category_valid(category_id):
     return True
 
 
-def check_input_error(title, slug, body, post_id, category_id):
+def check_input_valid(title, slug, body, post_id, category_id):
     error = None
     if not title:
         error = 'Title is required. (Up to 100 characters)'
@@ -80,9 +114,53 @@ def check_input_error(title, slug, body, post_id, category_id):
         error = 'Blank spaces, special chars except hyphen(-) are not allowed for Post URL slug. (Up to 200 characters)'
     elif not check_category_valid(category_id):
         error = 'Valid category must be selected.'
-    elif post_id is not None:
-        if not check_slug_not_duplicated(post_id, slug):
-            error = 'Post URL Slug is duplicated.'
+    elif not check_post_slug_not_duplicated(post_id, slug):
+        error = 'Post URL Slug is duplicated.'
     elif not body:
         error = 'Body is required.'
+    return error
+
+
+def check_settings_valid(values):
+    error = None
+    if not values['blog_title'] or len(values['blog_title']) < 1 or len(values['blog_title']) > 50:
+        error = 'Title is required. (Up to 50 characters)'
+    elif not values['posts_per_page'] or values['posts_per_page'] < 1 or values['posts_per_page'] > 20:
+        error = 'Correct number of \'Posts per page\' is required. (Between 1 to 20)'
+    elif not values['pagination_size'] or values['pagination_size'] < 3 or values['pagination_size'] > 10:
+        error = 'Correct number of \'Pagination size\' is required. (Between 3 to 10)'
+    return error
+
+
+def check_account_username_valid(username):
+    error = None
+    if not username or len(username) < 1 or len(username) > 255:
+        error = 'Correct number of characters of Username is required. (Up to 255 characters)'
+    return error
+
+
+def check_account_password_valid(user_id, values):
+    error = None
+    db = get_db()
+    user = db.execute(
+        'SELECT * FROM user WHERE id = ?', (user_id,)
+    ).fetchone()
+
+    if not values['pw_current'] or not check_password_hash(user['password'], values['pw_current']):
+        error = 'Current password is incorrect.'
+    elif not values['pw_new'] or len(values['pw_new']) < 8 or len(values['pw_new']) > 255:
+        error = 'Password must have between 8 to 255 characters.'
+    elif not values['pw_new_confirm'] or len(values['pw_new']) < 8 or len(values['pw_new']) > 255 \
+            or values['pw_new'] != values['pw_new_confirm']:
+        error = 'Both passwords (New, Confirm) must be matched.'
+    return error
+
+
+def check_category_valid(name, slug, category_id=None):
+    error = None
+
+    if not check_category_name_not_duplicated(name, category_id):
+        error = 'Category name must not be duplicated.'
+    elif not check_category_slug_not_duplicated(slug, category_id):
+        error = 'Category slug must not be duplicated.'
     return error
