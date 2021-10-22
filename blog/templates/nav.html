@@ -9,7 +9,7 @@
         <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Categories</a>
         <div class="dropdown-menu dropdown-menu-left">
           {% for c in categories %}
-          <a id="c_{{ c['id'] }}" class="dropdown-item" href="{{ url_for('blog.index', category=c['slug']) }}">{{ c['name'] }}</a>
+          <a id="c_{{ c['id'] }}" class="dropdown-item" href="{{ url_for('blog.index_category', category_slug=c['slug']) }}">{{ c['name'] }}</a>
           {% endfor %}
         </div>
       </li>
