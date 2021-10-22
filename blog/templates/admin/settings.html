@@ -1,0 +1,82 @@
+{% extends '/admin/admin_base.html' %}
+
+{% block title %}Settings | {% endblock %}
+
+{% block admin_content %}
+  <h2>Settings</h2>
+  <hr>
+  <p class="mb-4">Choose how your blog looks to visitors. You can set your own blog title, modify pagination settings, and decide to allow search bots or not.</p>
+
+  <fieldset>
+    <form id="settings" class="form-group needs-validation" method="post" novalidate>
+
+      <div class="form-row">
+        <div class="col-12 mb-3">
+          <label for="blog_title">Blog title</label>
+          <input name="blog_title" id="blog_title" class="form-control" type="text" value="{{ settings['blog_title'] }}" minlength="1" maxlength="50" required>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="col-6 mb-3">
+          <label for="posts_per_page">Posts per page <span class="text-muted">(1~20)</span></label>
+          <input name="posts_per_page" id="posts_per_page" class="form-control" type="number" value="{{ settings['posts_per_page'] }}" min="1" max="20" step="1" required>
+          <div class="invalid-tooltip">
+            Must be a number between 1 to 20
+          </div>
+        </div>
+
+        <div class="col-6 mb-3">
+          <label for="pagination_size">Pagination size <span class="text-muted">(3~10)</span></label>
+          <input name="pagination_size" id="pagination_size" class="form-control" type="number" value="{{ settings['pagination_size'] }}" min="3" max="10" step="1" required>
+          <div class="invalid-tooltip">
+            Must be a number between 3 to 10
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group mt-3">
+        <div id="switch_posts_truncate" class="custom-control custom-switch">
+          {% if settings['posts_truncate'] %}
+          <input type="checkbox" class="custom-control-input" id="posts_truncate" name="posts_truncate" checked>
+          {% else %}
+          <input type="checkbox" class="custom-control-input" id="posts_truncate" name="posts_truncate">
+          {% endif %}
+          <label class="custom-control-label" for="posts_truncate">Truncate posts at Home</label>
+        </div>
+
+        <div id="switch_search_allow" class="custom-control custom-switch">
+          {% if settings['search_allow'] %}
+          <input type="checkbox" class="custom-control-input" id="search_allow" name="search_allow" checked>
+          {% else %}
+          <input type="checkbox" class="custom-control-input" id="search_allow" name="search_allow">
+          {% endif %}
+          <label class="custom-control-label" for="search_allow">Allow search engines</label>
+        </div>
+      </div>
+
+      <button type="submit" name="submit" id="submit" class="btn btn-primary mt-4" value="Apply changes">Apply changes</button>
+
+    </form>
+  </fieldset>
+{% endblock %}
+
+{% block script %}
+<script>
+(function() {
+  'use strict';
+  window.addEventListener('load', function() {
+    var forms = document.getElementsByClassName('needs-validation');
+    var validation = Array.prototype.filter.call(forms, function(form) {
+      form.addEventListener('submit', function(event) {
+        if (form.checkValidity() === false) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+      }, false);
+    });
+  }, false);
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,193 @@
+{% extends '/admin/admin_base.html' %}
+
+{% block head %}
+  {{ super() }}
+  <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+  <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.js"></script>
+  <script src="{{ url_for('static', filename='jquery.ui.touch-punch.min.js') }}"></script>
+  <script type="module" src="{{ url_for('static', filename='script.js') }}"></script>
+  <script type="module" src="{{ url_for('static', filename='categories.js') }}"></script>
+  <script>
+  $(function() {
+    $('#category_list').sortable();
+  });
+  </script>
+  <style>
+    .list-group-item+.list-group-item {
+      border-top-width: 1px !important;
+      margin-top: -1px !important;
+  </style>
+{% endblock %}
+
+{% block title %}Categories | {% endblock %}
+
+{% block admin_content %}
+  <h2>Categories</h2>
+  <hr>
+  <p class="mb-4">Manage categories for your posts. You can also use drag & drop to adjust the order of category list appears in the top navbar and post editing pages.</p>
+
+  <button type="button" class="btn btn-primary" name="create_category_open_modal" id="create_category_open_modal" data-toggle="modal" data-target="#create_category_modal" value="Create new category">Create new category</button>
+
+  <ul id="category_list" class="list-group mt-4 mb-4">
+    {% for c in categories %}
+    <li id="{{ c['id'] }}" class="ui-state-default list-group-item d-flex align-items-center">
+      <span class="text-muted mr-2">&#x283F;</span>
+      <span class="mr-auto category_name">{{ c['name'] }}</span>
+      <span class="d-none category_slug">{{ c['slug'] }}</span>
+      <a class="badge badge-primary mr-2 edit_category_open_modal" type="button" data-toggle="modal" data-target="#edit_category_modal">EDIT</a>
+      <a class="badge badge-danger delete_category_open_modal" type="button" data-toggle="modal" data-target="#delete_category_modal">DELETE</a>
+    </li>
+    {% endfor %}
+  </ul>
+
+  <form id="sort_category" name="sort_category" method="post">
+    <input name="sort_category_order" id="sort_category_order" class="form-control d-none" type="text" readonly required>
+    <button type="submit" name="submit_sort_category" id="submit_sort_category" class="btn btn-primary" value="Save current order">Save current order</button>
+  </form>
+
+  <div class="modal fade" id="create_category_modal" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="create_category_label" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="create_category_label">Create new category</h5>
+          <button type="button" id="create_category_modal_close" name="create_category_modal_close" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <form id="create_category" name="create_category" class="form-group needs-validation mb-0" method="post" novalidate>
+
+          <div class="modal-body">
+            <p>Input the name and URL slug to create new category.</p>
+
+            <div class="form-row">
+              <div class="col-12 mb-3">
+                <label for="create_category_name">Name</label>
+                <input name="create_category_name" id="create_category_name" class="form-control" type="text" minlength="1" maxlength="32" required>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="col-12 mb-3">
+                <label for="create_category_slug" class="mt-3">Category URL slug</label>
+                <div class="input-group">
+                  <input name="create_category_slug" id="create_category_slug" class="form-control" type="text" minlength="1" maxlength="32" required readonly>
+                  <div class="input-group-append">
+                    <button type="button" form="create_category" name="create_category_btn_edit_slug" id="create_category_btn_edit_slug" class="btn btn-primary" value="Edit" disabled>Edit</button>
+                  </div>
+                </div>
+                <small class="form-text text-muted">
+                  {{ url_for('blog.index', _external=True) }}<span id="create_category_slug_url"></span>
+                </small>
+                <div class="invalid-tooltip">
+                  Blank spaces, special chars except hyphen(-) are not allowed.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" name="create_category_btn_cancel" id="create_category_btn_cancel" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+            <button type="submit" name="create_category_btn_submit" id="create_category_btn_submit" value="create" class="btn btn-primary" disabled>Create</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="edit_category_modal" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="edit_category_label" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="edit_category_label">Edit category</h5>
+          <button type="button" id="edit_category_modal_close" name="edit_category_modal_close" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <form id="edit_category" name="edit_category" class="form-group needs-validation mb-0" method="post" novalidate>
+
+          <div class="modal-body">
+            <p>Change the name and URL slug to edit current category.</p>
+
+            <div class="form-row">
+              <div class="col-12 mb-3">
+                <input name="edit_category_id" id="edit_category_id" class="form-control d-none" type="text" minlength="1" maxlength="32" readonly required>
+                <label for="edit_category_name">Name</label>
+                <input name="edit_category_name" id="edit_category_name" class="form-control" type="text" minlength="1" maxlength="32" required>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="col-12 mb-3">
+                <label for="edit_category_slug" class="mt-3">Category URL slug</label>
+                <div class="input-group">
+                  <input name="edit_category_slug" id="edit_category_slug" class="form-control" type="text" minlength="1" maxlength="32" required readonly>
+                  <div class="input-group-append">
+                    <button type="button" form="edit_category" name="edit_category_btn_edit_slug" id="edit_category_btn_edit_slug" class="btn btn-primary" value="Edit">Edit</button>
+                  </div>
+                </div>
+                <small class="form-text text-muted">
+                  {{ url_for('blog.index', _external=True) }}<span id="edit_category_slug_url"></span>
+                </small>
+                <div class="invalid-tooltip">
+                  Blank spaces, special chars except hyphen(-) are not allowed.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" name="edit_category_btn_cancel" id="edit_category_btn_cancel" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+            <button type="submit" name="edit_category_btn_submit" id="edit_category_btn_submit" value="Submit" class="btn btn-primary" disabled>Submit</button>
+          </div>
+
+        </form>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="delete_category_modal" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="post_delete_label" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="delete_category_label">Delete this category</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          Are you sure you want to delete "<span id="delete_category_name_text"></span>" category? It will not be able to recover later!
+        </div>
+        <form id="delete_category" name="delete_category" class="modal-footer" method="post">
+          <input name="delete_category_id" id="delete_category_id" class="form-control d-none" type="text" minlength="1" maxlength="32" readonly required>
+          <input name="delete_category_name" id="delete_category_name" class="form-control d-none" type="text" minlength="1" maxlength="32" readonly required>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+          <input type="submit" name="delete_category_btn_submit" id="delete_category_btn_submit" value="Delete" class="btn btn-danger">
+        </form>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}
+
+{% block script %}
+  <script>
+  (function() {
+    'use strict';
+    window.addEventListener('load', function() {
+      var forms = document.getElementsByClassName('needs-validation');
+      var validation = Array.prototype.filter.call(forms, function(form) {
+        form.addEventListener('submit', function(event) {
+          if (form.checkValidity() === false) {
+            event.preventDefault();
+            event.stopPropagation();
+          }
+          form.classList.add('was-validated');
+        }, false);
+      });
+    }, false);
+  })();
+  </script>
+{% endblock %}

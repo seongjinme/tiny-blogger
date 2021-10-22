@@ -1,0 +1,89 @@
+{% extends '/admin/admin_base.html' %}
+
+{% block title %}Account | {% endblock %}
+
+{% block head %}
+  {{ super() }}
+  <script>
+    /* Enable tooltips in bootstrap */
+    $(function () {
+      $('[data-toggle="tooltip"]').tooltip()
+    })
+  </script>
+{% endblock %}
+
+{% block admin_content %}
+  <h2>Account</h2>
+  <hr>
+  <p class="mb-4">Here you can change your username which will be included to your posts. You can also change password for login.</p>
+
+  <fieldset>
+    <legend>Basic info</legend>
+    <form id="basicinfo" class="form-group needs-validation" method="post" novalidate>
+
+      <div class="form-row">
+        <div class="col-6 mb-3">
+          <label for="userid">User ID <span class="text-muted">(unchangable)</span></label>
+          <input name="userid" id="userid" class="form-control" type="text" value="{{ account['userid'] }}" disabled>
+        </div>
+
+        <div class="col-6 mb-3">
+          <label for="username">Username</label>
+          <input name="username" id="username" class="form-control" type="text" value="{{ account['username'] }}" minlength="1" maxlength="255" required>
+          <div class="invalid-tooltip">
+            Username must have 1~255 characters.
+          </div>
+        </div>
+      </div>
+      <button type="submit" name="submit_basicinfo" id="submit_basicinfo" class="btn btn-primary" value="Apply changes">Apply changes</button>
+    </form>
+
+    <legend class="mt-5">Change password</legend>
+    <form id="password" class="form-group needs-validation" method="post" novalidate>
+
+      <div class="form-row">
+        <div class="col-6 mb-3">
+          <label for="pw_current">Current password</label>
+          <input name="pw_current" id="pw_current" class="form-control" type="password" minlength="8" maxlength="255" autocomplete="false" required>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="col-6 mb-3">
+          <label for="pw_new">New password</label>
+          <input name="pw_new" id="pw_new" class="form-control" type="password" minlength="8" maxlength="255" autocomplete="false" required>
+          <div class="invalid-tooltip">
+            Password must have 8~255 characters.
+          </div>
+        </div>
+        <div class="col-6 mb-3">
+          <label for="pw_new_confirm">Confirm password</label>
+          <input name="pw_new_confirm" id="pw_new_confirm" class="form-control" type="password" minlength="8" maxlength="255" autocomplete="false" required>
+          <div class="invalid-tooltip">
+            Must be same with new password.
+          </div>
+        </div>
+      </div>
+      <button type="submit" name="submit_password" id="submit_password" class="btn btn-primary" value="Change password">Change password</button>
+    </form>
+{% endblock %}
+
+{% block script %}
+<script>
+(function() {
+  'use strict';
+  window.addEventListener('load', function() {
+    var forms = document.getElementsByClassName('needs-validation');
+    var validation = Array.prototype.filter.call(forms, function(form) {
+      form.addEventListener('submit', function(event) {
+        if (form.checkValidity() === false) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+      }, false);
+    });
+  }, false);
+})();
+</script>
+{% endblock %}
