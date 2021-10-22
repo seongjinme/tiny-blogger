@@ -25,16 +25,12 @@
         <button type="button" form="create" name="btn_edit_slug" id="btn_edit_slug" class="btn btn-primary" value="Edit" disabled>Edit</button>
       </div>
     </div>
-    <small class="form-text text-muted">
-      {{ url_for('blog.index', _external=True) }}<span id="slug_url"></span>
-    </small>
 
     <label for="category" class="mt-3">Category</label>
     <div class="form-group mb-4">
       <select name="category" id="category" class="custom-select" required>
-        <option value="" selected>Select category</option>
         {% for c in categories %}
-        <option value="{{ c['id'] }}">{{ c['name'] }}</option>
+        <option value="{{ c['id'] }}"{% if c['name'] == default_category['name'] %} selected{% endif %}>{{ c['name'] }}</option>
         {% endfor %}
       </select>
     </div>
