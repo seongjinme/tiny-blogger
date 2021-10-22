@@ -26,24 +26,48 @@
   <hr>
   <p class="mb-4">Manage categories for your posts. You can also use drag & drop to adjust the order of category list appears in the top navbar and post editing pages.</p>
 
-  <button type="button" class="btn btn-primary" name="create_category_open_modal" id="create_category_open_modal" data-toggle="modal" data-target="#create_category_modal" value="Create new category">Create new category</button>
+  <fieldset>
 
-  <ul id="category_list" class="list-group mt-4 mb-4">
-    {% for c in categories %}
-    <li id="{{ c['id'] }}" class="ui-state-default list-group-item d-flex align-items-center">
-      <span class="text-muted mr-2">&#x283F;</span>
-      <span class="mr-auto category_name">{{ c['name'] }}</span>
-      <span class="d-none category_slug">{{ c['slug'] }}</span>
-      <a class="badge badge-primary mr-2 edit_category_open_modal" type="button" data-toggle="modal" data-target="#edit_category_modal">EDIT</a>
-      <a class="badge badge-danger delete_category_open_modal" type="button" data-toggle="modal" data-target="#delete_category_modal">DELETE</a>
-    </li>
-    {% endfor %}
-  </ul>
+    <legend class="mt-5 mb-3">Manage categories</legend>
+    <button type="button" class="btn btn-primary" name="create_category_open_modal" id="create_category_open_modal" data-toggle="modal" data-target="#create_category_modal" value="Create new category">Create new category</button>
 
-  <form id="sort_category" name="sort_category" method="post">
-    <input name="sort_category_order" id="sort_category_order" class="form-control d-none" type="text" readonly required>
-    <button type="submit" name="submit_sort_category" id="submit_sort_category" class="btn btn-primary" value="Save current order">Save current order</button>
-  </form>
+    <ul id="category_list" class="list-group mt-4 mb-4">
+      {% for c in categories %}
+      <li id="{{ c['id'] }}" class="ui-state-default list-group-item d-flex align-items-center">
+        <span class="text-muted mr-2">&#x283F;</span>
+        <span class="mr-auto category_name">{{ c['name'] }}</span>
+        <span class="d-none category_slug">{{ c['slug'] }}</span>
+        {% if c['id'] == default_category['id'] %}
+        <span class="badge badge-success mr-2">DEFAULT</span>
+        {% endif %}
+        <a class="badge badge-primary mr-2 edit_category_open_modal" type="button" data-toggle="modal" data-target="#edit_category_modal">EDIT</a>
+        {% if c['id'] != default_category['id'] %}
+        <a class="badge badge-danger delete_category_open_modal" type="button" data-toggle="modal" data-target="#delete_category_modal">DELETE</a>
+        {% else %}
+        <span class="badge badge-secondary text-white">DELETE</span>
+        {% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+
+    <form id="sort_category" name="sort_category" method="post">
+      <input name="sort_category_order" id="sort_category_order" class="form-control d-none" type="text" readonly required>
+      <button type="submit" name="submit_sort_category" id="submit_sort_category" class="btn btn-primary" value="Save current order">Save current order</button>
+    </form>
+
+    <legend class="mt-5 mb-3">Set default category</legend>
+    <form id="default_category" name="default_category" method="post">
+      <div class="form-group mb-4">
+        <select name="select_default_category" id="select_default_category" class="custom-select" required>
+          {% for c in categories %}
+          <option value="{{ c['id'] }}"{% if c['name'] == default_category['name'] %} selected{% endif %}>{{ c['name'] }}</option>
+          {% endfor %}
+        </select>
+        <small class="ml-1 mr-1">If a category with posts is deleted, the remaining posts will be moved to the default category.</small>
+      </div>
+      <button type="submit" name="submit_default_category" id="submit_default_category" class="btn btn-primary" value="Save default category">Save default category</button>
+    </form>
+  </fieldset>
 
   <div class="modal fade" id="create_category_modal" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="create_category_label" aria-hidden="true">
     <div class="modal-dialog">
@@ -76,9 +100,6 @@
                     <button type="button" form="create_category" name="create_category_btn_edit_slug" id="create_category_btn_edit_slug" class="btn btn-primary" value="Edit" disabled>Edit</button>
                   </div>
                 </div>
-                <small class="form-text text-muted">
-                  {{ url_for('blog.index', _external=True) }}<span id="create_category_slug_url"></span>
-                </small>
                 <div class="invalid-tooltip">
                   Blank spaces, special chars except hyphen(-) are not allowed.
                 </div>
@@ -127,9 +148,6 @@
                     <button type="button" form="edit_category" name="edit_category_btn_edit_slug" id="edit_category_btn_edit_slug" class="btn btn-primary" value="Edit">Edit</button>
                   </div>
                 </div>
-                <small class="form-text text-muted">
-                  {{ url_for('blog.index', _external=True) }}<span id="edit_category_slug_url"></span>
-                </small>
                 <div class="invalid-tooltip">
                   Blank spaces, special chars except hyphen(-) are not allowed.
                 </div>
@@ -158,7 +176,8 @@
           </button>
         </div>
         <div class="modal-body">
-          Are you sure you want to delete "<span id="delete_category_name_text"></span>" category? It will not be able to recover later!
+          <p>Are you sure you want to delete <strong>"<span id="delete_category_name_text"></span>"</strong> category? It will not be able to recover later!</p>
+          <p class="mb-0">The remaining posts will be moved to <strong>"{{ default_category['name'] }}"</strong> category.</p>
         </div>
         <form id="delete_category" name="delete_category" class="modal-footer" method="post">
           <input name="delete_category_id" id="delete_category_id" class="form-control d-none" type="text" minlength="1" maxlength="32" readonly required>

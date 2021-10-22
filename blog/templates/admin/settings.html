@@ -44,15 +44,6 @@
           {% endif %}
           <label class="custom-control-label" for="posts_truncate">Truncate posts at Home</label>
         </div>
-
-        <div id="switch_search_allow" class="custom-control custom-switch">
-          {% if settings['search_allow'] %}
-          <input type="checkbox" class="custom-control-input" id="search_allow" name="search_allow" checked>
-          {% else %}
-          <input type="checkbox" class="custom-control-input" id="search_allow" name="search_allow">
-          {% endif %}
-          <label class="custom-control-label" for="search_allow">Allow search engines</label>
-        </div>
       </div>
 
       <button type="submit" name="submit" id="submit" class="btn btn-primary mt-4" value="Apply changes">Apply changes</button>
