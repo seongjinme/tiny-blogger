@@ -1,6 +1,8 @@
 import { btn_edit_slug_action, fill_slug, slugify, enable_submit, cancel_submit } from './script.js';
 
 create_category_open_modal.addEventListener('click', add_create_event_listener);
+submit_sort_category.addEventListener('click', get_category_order);
+
 const edit_category_btn_list = document.querySelectorAll('.edit_category_open_modal');
 const delete_category_btn_list = document.querySelectorAll('.delete_category_open_modal');
 const category_lists = document.querySelectorAll('ul#category_list > li');
@@ -143,4 +145,13 @@ function set_delete_category_contents() {
     document.getElementById('delete_category_id').value = category_id;
     document.getElementById('delete_category_name').value = category_name;
     document.getElementById('delete_category_name_text').textContent = category_name;
+}
+
+function get_category_order() {
+    const list = document.getElementById('category_list').getElementsByTagName('li');
+    let id_list = [];
+    for (let i = 0; i < list.length; i++) {
+        id_list.push(list[i].id);
+    }
+    sort_category_order.value = id_list;
 }
