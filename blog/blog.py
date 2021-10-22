@@ -199,6 +199,10 @@ def index_category(category_slug):
 
 @bp.route('/<string:category_slug>/<string:slug>/')
 def view_post(category_slug, slug):
+    # If there's no registered user, redirect to register page
+    if not check_user_exists():
+        return redirect(url_for('auth.register'))
+
     post = get_post(slug, False)
     return render_template('blog/post.html', blog_info=get_blog_info(), post=post,
                            categories=get_category_list())
@@ -278,6 +282,10 @@ def delete(category_slug, slug):
 
 @bp.route('/about')
 def about():
+    # If there's no registered user, redirect to register page
+    if not check_user_exists():
+        return redirect(url_for('auth.register'))
+
     post = get_about()
     return render_template('blog/about.html', blog_info=get_blog_info(), post=post,
                            categories=get_category_list())
