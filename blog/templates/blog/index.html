@@ -29,6 +29,14 @@
     <article class="post">
       <header>
         <h2><a href="{{ url_for('blog.view_post', category_slug=post['c_slug'], slug=post['slug']) }}">{{ post['title'] }}</a></h2>
+        <div class="text-muted">
+          {{ post['created'].strftime('%Y-%m-%d') }}
+          &nbsp;&nbsp;·&nbsp;&nbsp;
+          <a class="text-muted" href="{{ url_for('blog.index_category', category_slug=post['c_slug']) }}">{{ post['c_name'] }}</a>
+          {% if g.user['id'] == post['user_id'] %}
+            <a role="button" class="btn btn-secondary btn-sm" style="margin-left: 1rem;" href="{{ url_for('blog.edit', category_slug=post['c_slug'], slug=post['slug']) }}">Edit</a>
+          {% endif %}
+        </div>
       </header>
       <p class="body">
       {% if posts_truncate %}
@@ -37,16 +45,6 @@
         {{ post['body']|safe }}
       {% endif %}
       </p>
-      <footer>
-        <div class="text-muted">
-          {{ post['created'].strftime('%Y-%m-%d') }}
-          &nbsp;&nbsp;·&nbsp;&nbsp;
-          <a href="{{ url_for('blog.index_category', category_slug=post['c_slug']) }}">{{ post['c_name'] }}</a>
-          {% if g.user['id'] == post['user_id'] %}
-            <a role="button" class="btn btn-secondary btn-sm" style="margin-left: 1rem;" href="{{ url_for('blog.edit', category_slug=post['c_slug'], slug=post['slug']) }}">Edit</a>
-          {% endif %}
-        </div>
-      </footer>
     </article>
     {% if not loop.last %}
       <hr>
