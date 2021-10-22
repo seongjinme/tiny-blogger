@@ -5,7 +5,7 @@ from flask import (
 from werkzeug.security import check_password_hash, generate_password_hash
 from blog.db import get_db
 from blog.checker import check_category_exists, check_post_exists
-from blog.getter import get_blog_title
+from blog.getter import get_blog_info
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 
@@ -97,9 +97,9 @@ def login():
 
         # Store error message
         flash(error)
-        return render_template('auth/login.html', blog_title=get_blog_title(), alarm_type='light')
+        return render_template('auth/login.html', blog_info=get_blog_info(), alarm_type='light')
 
-    return render_template('auth/login.html', blog_title=get_blog_title())
+    return render_template('auth/login.html', blog_info=get_blog_info())
 
 
 # Check user info of current session before view function in blog

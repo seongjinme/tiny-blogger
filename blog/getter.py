@@ -3,9 +3,12 @@ from flask import g
 from werkzeug.exceptions import abort
 
 
-def get_blog_title():
-    value = get_db().execute('SELECT blog_title FROM setting').fetchone()
-    return value['blog_title']
+def get_blog_info():
+    values = {
+        'title': get_db().execute('SELECT blog_title FROM setting').fetchone()['blog_title'],
+        'user': get_db().execute('SELECT username FROM user').fetchone()['username']
+    }
+    return values
 
 
 def get_post(slug, check_author=True):

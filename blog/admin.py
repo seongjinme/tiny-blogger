@@ -8,7 +8,7 @@ from blog.checker import (
     check_settings_valid, check_account_username_valid, check_account_password_valid,
     check_category_valid, check_category_ids_valid
 )
-from blog.getter import get_blog_title, get_category_list, get_default_category, get_row_count
+from blog.getter import get_blog_info, get_category_list, get_default_category, get_row_count
 
 bp = Blueprint('admin', __name__, url_prefix='/admin')
 
@@ -45,10 +45,10 @@ def settings():
     ).fetchone()
 
     if error:
-        return render_template('admin/settings.html', blog_title=get_blog_title(), categories=get_category_list(),
+        return render_template('admin/settings.html', blog_info=get_blog_info(), categories=get_category_list(),
                                alarm_type='danger', settings=values, current='settings')
 
-    return render_template('admin/settings.html', blog_title=get_blog_title(), categories=get_category_list(),
+    return render_template('admin/settings.html', blog_info=get_blog_info(), categories=get_category_list(),
                            alarm_type='success', settings=values, current='settings')
 
 
@@ -90,10 +90,10 @@ def account():
     values = db.execute('SELECT userid, username FROM user WHERE id = ?', (user_id,)).fetchone()
 
     if error:
-        return render_template('admin/account.html', blog_title=get_blog_title(), categories=get_category_list(),
+        return render_template('admin/account.html', blog_info=get_blog_info(), categories=get_category_list(),
                                alarm_type='danger', account=values, current='account')
 
-    return render_template('admin/account.html', blog_title=get_blog_title(), categories=get_category_list(),
+    return render_template('admin/account.html', blog_info=get_blog_info(), categories=get_category_list(),
                            alarm_type='success', account=values, current='account')
 
 
@@ -200,8 +200,8 @@ def categories():
                 return redirect(url_for('admin.categories'))
 
     if error:
-        return render_template('admin/categories.html', blog_title=get_blog_title(), categories=get_category_list(),
+        return render_template('admin/categories.html', blog_info=get_blog_info(), categories=get_category_list(),
                                default_category=get_default_category(), alarm_type='danger', current='categories')
 
-    return render_template('admin/categories.html', blog_title=get_blog_title(), categories=get_category_list(),
+    return render_template('admin/categories.html', blog_info=get_blog_info(), categories=get_category_list(),
                            default_category=get_default_category(), alarm_type='success', current='categories')

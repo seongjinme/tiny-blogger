@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <div class="row mt-3">
+  <div class="row mt-3 mb-5">
     <div id="admin_nav" class="d-none d-md-block col-md-3 mb-3 list-group">
       <a href="{{ url_for('admin.settings') }}" class="list-group-item list-group-item-action{% if current == 'settings' %} active{% endif %}">Settings</a>
       <a href="{{ url_for('admin.account') }}" class="list-group-item list-group-item-action{% if current == 'account' %} active{% endif %}">Account</a>

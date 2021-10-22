@@ -7,7 +7,7 @@ from blog.checker import (
     check_input_valid, check_user_exists, check_category_exists, check_setting_exists, check_about_input_valid
 )
 from blog.getter import (
-    get_blog_title, get_post, get_category_by_post_id, get_category_by_slug, get_default_category,
+    get_blog_info, get_post, get_category_by_post_id, get_category_by_slug, get_default_category,
     get_category_list, get_pagination_ranges, get_posts_per_page, get_posts_per_page_by_search,
     get_about
 )
@@ -115,11 +115,11 @@ def index():
 
     if error:
         flash(error)
-        return render_template('blog/index.html', blog_title=get_blog_title(), categories=get_category_list(),
+        return render_template('blog/index.html', blog_info=get_blog_info(), categories=get_category_list(),
                                posts=posts, query=query, page=page, pages=pages, alarm_type='danger',
                                p_num_start=p_num_start, p_num_end=p_num_end, posts_truncate=posts_truncate)
 
-    return render_template('blog/index.html', blog_title=get_blog_title(), categories=get_category_list(),
+    return render_template('blog/index.html', blog_info=get_blog_info(), categories=get_category_list(),
                            posts=posts, query=query, page=page, pages=pages,
                            p_num_start=p_num_start, p_num_end=p_num_end, posts_truncate=posts_truncate)
 
@@ -186,12 +186,12 @@ def index_category(category_slug):
 
     if error:
         flash(error)
-        return render_template('blog/index.html', blog_title=get_blog_title(), categories=get_category_list(),
+        return render_template('blog/index.html', blog_info=get_blog_info(), categories=get_category_list(),
                                posts=posts, query=query, page=page, pages=pages, alarm_type='danger',
                                p_num_start=p_num_start, p_num_end=p_num_end, posts_truncate=posts_truncate,
                                index_category=get_category_by_slug(category_slug), index_category_slug=category_slug)
 
-    return render_template('blog/index.html', blog_title=get_blog_title(), categories=get_category_list(),
+    return render_template('blog/index.html', blog_info=get_blog_info(), categories=get_category_list(),
                            posts=posts, query=query, page=page, pages=pages,
                            p_num_start=p_num_start, p_num_end=p_num_end, posts_truncate=posts_truncate,
                            index_category=get_category_by_slug(category_slug), index_category_slug=category_slug)
@@ -200,7 +200,7 @@ def index_category(category_slug):
 @bp.route('/<string:category_slug>/<string:slug>/')
 def view_post(category_slug, slug):
     post = get_post(slug, False)
-    return render_template('blog/post.html', blog_title=get_blog_title(), post=post,
+    return render_template('blog/post.html', blog_info=get_blog_info(), post=post,
                            categories=get_category_list())
 
 
@@ -228,7 +228,7 @@ def create():
             flash('Your post has successfully updated!')
             return redirect(url_for('blog.index'))
 
-    return render_template('blog/create.html', blog_title=get_blog_title(), alarm_type='danger',
+    return render_template('blog/create.html', blog_info=get_blog_info(), alarm_type='danger',
                            default_category=get_default_category(), categories=get_category_list())
 
 
@@ -261,7 +261,7 @@ def edit(category_slug, slug):
             flash('Your post has successfully updated!')
             return redirect(url_for('blog.index'))
 
-    return render_template('blog/edit.html', blog_title=get_blog_title(), post=post, alarm_type='danger',
+    return render_template('blog/edit.html', blog_info=get_blog_info(), post=post, alarm_type='danger',
                            category=get_category_by_post_id(post['id']), categories=get_category_list())
 
 
@@ -279,7 +279,7 @@ def delete(category_slug, slug):
 @bp.route('/about')
 def about():
     post = get_about()
-    return render_template('blog/about.html', blog_title=get_blog_title(), post=post,
+    return render_template('blog/about.html', blog_info=get_blog_info(), post=post,
                            categories=get_category_list())
 
 
@@ -305,4 +305,4 @@ def edit_about():
             flash("Your 'About' page has successfully updated!")
             return redirect(url_for('blog.about'))
 
-    return render_template('blog/edit_about.html', blog_title=get_blog_title(), post=post, alarm_type='danger')
+    return render_template('blog/edit_about.html', blog_info=get_blog_info(), post=post, alarm_type='danger')
