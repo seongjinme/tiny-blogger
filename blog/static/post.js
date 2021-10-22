@@ -12,9 +12,8 @@ form.addEventListener('input', event => enable_submit(title, slug, context, btn_
 
 title.addEventListener('change', () => {
     slug.value = slugify(title.value);
-    slug_url.textContent = slug.value;
     btn_edit_slug.disabled = !slug.value;
     enable_submit(title, slug, context, btn_submit);
 });
 
-btn_edit_slug.addEventListener('click', event => btn_edit_slug_action(context, title, slug, slug_url, btn_edit_slug, slug_length_max, btn_submit));
+btn_edit_slug.addEventListener('click', event => btn_edit_slug_action(context, title, slug, btn_edit_slug, slug_length_max, btn_submit));

@@ -1,4 +1,4 @@
-export function btn_edit_slug_action(context, title, slug, slug_url, btn_edit_slug, slug_length_max, btn_submit) {
+export function btn_edit_slug_action(context, title, slug, btn_edit_slug, slug_length_max, btn_submit) {
     if (slug.readOnly) {
         slug.readOnly = false;
         btn_edit_slug.textContent = 'Done';
@@ -8,7 +8,6 @@ export function btn_edit_slug_action(context, title, slug, slug_url, btn_edit_sl
         btn_edit_slug.textContent = 'Edit';
         btn_edit_slug.className = 'btn btn-primary';
         fill_slug(slug, title, slug_length_max);
-        slug_url.textContent = slug.value;
     }
     enable_submit(title, slug, context, btn_submit);
 }
@@ -61,11 +60,10 @@ export function enable_submit(title, slug, context, btn_submit) {
     }
 }
 
-export function cancel_submit(title, slug, slug_url, context, btn_edit_slug) {
+export function cancel_submit(title, slug, context, btn_edit_slug) {
     if (context == 'category') {
         title.value = '';
         slug.value = '';
-        slug_url.textContent = '';
         btn_edit_slug.textContent = 'Edit';
         btn_edit_slug.className = 'btn btn-primary';
         btn_edit_slug.disabled = true;

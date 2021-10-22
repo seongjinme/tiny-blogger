@@ -7,11 +7,11 @@ const edit_category_btn_list = document.querySelectorAll('.edit_category_open_mo
 const delete_category_btn_list = document.querySelectorAll('.delete_category_open_modal');
 const category_lists = document.querySelectorAll('ul#category_list > li');
 
-for (let i = 0; i < category_lists.length; i++) {
+for (let i = 0; i < edit_category_btn_list.length; i++) {
     edit_category_btn_list[i].addEventListener('click', add_edit_event_listener);
 }
 
-for (let i = 0; i < category_lists.length; i++) {
+for (let i = 0; i < delete_category_btn_list.length; i++) {
     delete_category_btn_list[i].addEventListener('click', set_delete_category_contents);
 }
 
@@ -24,7 +24,6 @@ function category_global_variables(mode) {
             'title': create_category_name,
             'slug': create_category_slug,
             'slug_length_max': 32,
-            'slug_url': create_category_slug_url,
             'btn_edit_slug': create_category_btn_edit_slug,
             'btn_cancel': create_category_btn_cancel,
             'btn_close': create_category_modal_close,
@@ -38,7 +37,6 @@ function category_global_variables(mode) {
             'title': edit_category_name,
             'slug': edit_category_slug,
             'slug_length_max': 32,
-            'slug_url': edit_category_slug_url,
             'btn_edit_slug': edit_category_btn_edit_slug,
             'btn_cancel': edit_category_btn_cancel,
             'btn_close': edit_category_modal_close,
@@ -65,17 +63,17 @@ function run_create_enable_submit() {
 
 function run_create_change_slug_value() {
     const g = category_global_variables('create');
-    change_slug_value(g.context, g.title, g.slug, g.slug_url, g.btn_edit_slug, g.btn_submit);
+    change_slug_value(g.context, g.title, g.slug, g.btn_edit_slug, g.btn_submit);
 }
 
 function run_create_btn_edit_slug_action() {
     const g = category_global_variables('create');
-    btn_edit_slug_action(g.context, g.title, g.slug, g.slug_url, g.btn_edit_slug, g.slug_length_max, g.btn_submit);
+    btn_edit_slug_action(g.context, g.title, g.slug, g.btn_edit_slug, g.slug_length_max, g.btn_submit);
 }
 
 function run_create_close_modal() {
     const g = category_global_variables('create');
-    cancel_submit(g.title, g.slug, g.slug_url, g.context, g.btn_edit_slug);
+    cancel_submit(g.title, g.slug, g.context, g.btn_edit_slug);
     remove_create_event_listener(g);
 }
 
@@ -87,9 +85,8 @@ function remove_create_event_listener(g) {
     g.btn_close.removeEventListener('click', run_create_close_modal);
 }
 
-function change_slug_value(context, title, slug, slug_url, btn_edit_slug, btn_submit) {
+function change_slug_value(context, title, slug, btn_edit_slug, btn_submit) {
     slug.value = slugify(title.value);
-    slug_url.textContent = slug.value;
     btn_edit_slug.disabled = !slug.value;
     enable_submit(title, slug, context, btn_submit);
 }
@@ -100,7 +97,6 @@ function add_edit_event_listener() {
     g.id.value = this.parentElement.id;
     g.title.value = this.parentElement.querySelector('span.mr-auto.category_name').textContent;
     g.slug.value = this.parentElement.querySelector('span.d-none.category_slug').textContent;
-    g.slug_url.textContent = this.parentElement.querySelector('span.d-none.category_slug').textContent;
     g.btn_edit_slug.disabled = !g.slug.value;
 
     g.form.addEventListener('input', run_edit_enable_submit);
@@ -117,17 +113,17 @@ function run_edit_enable_submit() {
 
 function run_edit_change_slug_value() {
     const g = category_global_variables('edit');
-    change_slug_value(g.context, g.title, g.slug, g.slug_url, g.btn_edit_slug, g.btn_submit);
+    change_slug_value(g.context, g.title, g.slug, g.btn_edit_slug, g.btn_submit);
 }
 
 function run_edit_btn_edit_slug_action() {
     const g = category_global_variables('edit');
-    btn_edit_slug_action(g.context, g.title, g.slug, g.slug_url, g.btn_edit_slug, g.slug_length_max, g.btn_submit);
+    btn_edit_slug_action(g.context, g.title, g.slug, g.btn_edit_slug, g.slug_length_max, g.btn_submit);
 }
 
 function run_edit_close_modal() {
     const g = category_global_variables('edit');
-    cancel_submit(g.title, g.slug, g.slug_url, g.context, g.btn_edit_slug);
+    cancel_submit(g.title, g.slug, g.context, g.btn_edit_slug);
     remove_edit_event_listener(g);
 }
 
