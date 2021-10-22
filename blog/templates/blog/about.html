@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ post['title'] }} | {% endblock %}
+{% block title %}{{ post['title'] or 'About' }} | {% endblock %}
 
 {% block content %}
   <article class="post">
