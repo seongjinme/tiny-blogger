@@ -35,6 +35,8 @@
       <footer>
         <div class="text-muted">
           {{ post['created'].strftime('%Y-%m-%d') }}
+          &nbsp;&nbsp;&nbsp;·&nbsp;&nbsp;&nbsp;
+          {{ post['c_name'] }}
           {% if g.user['id'] == post['user_id'] %}
             <a role="button" class="btn btn-secondary btn-sm" style="margin-left: 1rem;" href="{{ url_for('blog.edit', slug=post['slug']) }}">Edit</a>
           {% endif %}

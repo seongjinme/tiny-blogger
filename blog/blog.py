@@ -107,14 +107,17 @@ def index():
 
         # Case 3-2 : If there's no post at all, render an alarm message only
         else:
-            error = "There is no post yet. Why don't you start blogging now? :)"
+            flash("There is no post yet. Why don't you start blogging now? :)")
             posts = None
             page = 1
 
     if error:
         flash(error)
+        return render_template('blog/index.html', blog_title=get_blog_title(), categories=get_category_list(),
+                               posts=posts, query=query, page=page, pages=pages, alarm_type='danger',
+                               p_num_start=p_num_start, p_num_end=p_num_end, posts_truncate=posts_truncate)
 
-    return render_template('blog/index.html', blog_title=get_blog_title(),
+    return render_template('blog/index.html', blog_title=get_blog_title(), categories=get_category_list(),
                            posts=posts, query=query, page=page, pages=pages,
                            p_num_start=p_num_start, p_num_end=p_num_end, posts_truncate=posts_truncate)
 
@@ -122,7 +125,8 @@ def index():
 @bp.route('/<string:slug>/')
 def view_post(slug):
     post = get_post(slug, False)
-    return render_template('blog/post.html', blog_title=get_blog_title(), post=post)
+    return render_template('blog/post.html', blog_title=get_blog_title(), post=post,
+                           categories=get_category_list())
 
 
 @bp.route('/create', methods=('GET', 'POST'))
@@ -149,16 +153,14 @@ def create():
             flash('Your post has successfully updated!')
             return redirect(url_for('blog.index'))
 
-    categories = get_category_list()
-    return render_template('blog/create.html', blog_title=get_blog_title(), alarm_type='danger', categories=categories)
+    return render_template('blog/create.html', blog_title=get_blog_title(), alarm_type='danger',
+                           categories=get_category_list())
 
 
 @bp.route('/<string:slug>/edit', methods=('GET', 'POST'))
 @login_required
 def edit(slug):
     post = get_post(slug)
-    category = get_category(post['id'])
-    categories = get_category_list(post['category_id'])
 
     if request.method == 'POST':
         slug_before = slug
@@ -184,8 +186,8 @@ def edit(slug):
             flash('Your post has successfully updated!')
             return redirect(url_for('blog.index'))
 
-    return render_template('blog/edit.html', blog_title=get_blog_title(),
-                           post=post, alarm_type='danger', category=category, categories=categories)
+    return render_template('blog/edit.html', blog_title=get_blog_title(), post=post, alarm_type='danger',
+                           category=get_category(post['id']), categories=get_category_list())
 
 
 @bp.route('/<string:slug>/delete', methods=('POST',))
@@ -195,4 +197,5 @@ def delete(slug):
     db = get_db()
     db.execute('DELETE FROM post WHERE slug = ?', (slug,))
     db.commit()
+    flash('Your post has successfully deleted!')
     return redirect(url_for('blog.index'))

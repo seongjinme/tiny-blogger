@@ -10,9 +10,11 @@ def get_blog_title():
 
 def get_post(slug, check_author=True):
     post = get_db().execute(
-        'SELECT p.id, slug, title, body, created, user_id, username, category_id'
-        ' FROM post p JOIN user u ON p.user_id = u.id'
-        ' WHERE slug = ?',
+        'SELECT p.id, c.name c_name, c.slug c_slug, p.slug slug, title, body, created, user_id, username'
+        ' FROM post p'
+        ' JOIN user u ON p.user_id = u.id'
+        ' JOIN category c ON p.category_id = c.id'
+        ' WHERE p.slug = ?',
         (slug,)
     ).fetchone()
 
@@ -25,16 +27,12 @@ def get_post(slug, check_author=True):
     return post
 
 
-def get_category_list(category_id=None):
-    if category_id is None:
-        c_id = 'NULL'
-    else:
-        c_id = int(category_id)
-
+def get_category_list():
     category_list = get_db().execute(
-        'SELECT id, name FROM category WHERE id != ?',
-        (c_id,)
-    )
+        'SELECT id, name, slug'
+        ' FROM category'
+        ' ORDER BY c_order ASC'
+    ).fetchall()
 
     if category_list is None:
         abort(403, "There's no category to get.")
@@ -124,7 +122,7 @@ def get_pagination_ranges(page=None, query=None):
 def get_posts_per_page_by_search(query_string, offset, per_page):
     db = get_db()
     return db.execute(
-        'SELECT p.id, c.name, c.slug c_slug, title, p.slug slug, body, created, user_id, username'
+        'SELECT p.id, c.name c_name, c.slug c_slug, title, p.slug slug, body, created, user_id, username'
         ' FROM post p'
         ' JOIN user u ON p.user_id = u.id'
         ' JOIN category c ON p.category_id = c.id'
@@ -138,7 +136,7 @@ def get_posts_per_page_by_search(query_string, offset, per_page):
 def get_posts_per_page(offset, per_page):
     db = get_db()
     return db.execute(
-        'SELECT p.id, c.name, c.slug c_slug, title, p.slug slug, body, created, user_id, username'
+        'SELECT p.id, c.name c_name, c.slug c_slug, title, p.slug slug, body, created, user_id, username'
         ' FROM post p'
         ' JOIN user u ON p.user_id = u.id'
         ' JOIN category c ON p.category_id = c.id'

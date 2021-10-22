@@ -32,9 +32,8 @@
     <label for="category" class="mt-3">Category</label>
     <div class="form-group mb-4">
       <select name="category" id="category" class="custom-select" required>
-        <option value="{{ category['id'] }}" selected>{{ category['name'] }}</option>
         {% for c in categories %}
-        <option value="{{ c['id'] }}">{{ c['name'] }}</option>
+        <option value="{{ c['id'] }}"{% if c['name'] == category['name'] %} selected{% endif %}>{{ c['name'] }}</option>
         {% endfor %}
       </select>
     </div>
