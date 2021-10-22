@@ -29,6 +29,13 @@ def check_setting_exists():
         db.execute(
             'INSERT INTO setting DEFAULT VALUES;'
         )
+        db.execute(
+            'UPDATE setting SET blog_about_title = ?, blog_about_body = ?', (
+                "About this blog",
+                "This is the page where you can post and open your own profile! "
+                "If you're logged in, click 'edit' button to create your own profile :)"
+            )
+        )
         db.commit()
 
 
@@ -46,7 +53,8 @@ def check_post_exists(userid):
         db.execute(
             'INSERT INTO post (user_id, category_id, title, slug, body) VALUES (?, ?, ?, ?, ?)',
             (user['id'], category['id'], 'Hello, world!', 'hello-world',
-             "Thank you for using tiny-blogger! Click 'Admin' > 'New Post' to create your own posts :)")
+             "Thank you for using tiny-blogger! "
+             "If you're logged in, click 'Admin' > 'New Post' to create your own posts :)")
         )
         db.commit()
 
@@ -143,8 +151,8 @@ def check_settings_valid(values):
 
 def check_account_username_valid(username):
     error = None
-    if not username or len(username) < 1 or len(username) > 255:
-        error = 'Correct number of characters of Username is required. (Up to 255 characters)'
+    if not username or len(username) < 1 or len(username) > 32:
+        error = 'Correct number of characters of Username is required. (Up to 32 characters)'
     return error
 
 
@@ -157,10 +165,29 @@ def check_account_password_valid(user_id, values):
 
     if not values['pw_current'] or not check_password_hash(user['password'], values['pw_current']):
         error = 'Current password is incorrect.'
-    elif not values['pw_new'] or len(values['pw_new']) < 8 or len(values['pw_new']) > 255:
-        error = 'Password must have between 8 to 255 characters.'
-    elif not values['pw_new_confirm'] or len(values['pw_new']) < 8 or len(values['pw_new']) > 255 \
+    elif not values['pw_new'] or len(values['pw_new']) < 8 or len(values['pw_new']) > 128:
+        error = 'Password must have between 8 to 128 characters.'
+    elif not values['pw_new_confirm'] or len(values['pw_new_confirm']) < 8 or len(values['pw_new_confirm']) > 128 \
             or values['pw_new'] != values['pw_new_confirm']:
+        error = 'Both passwords (New, Confirm) must be matched.'
+    return error
+
+
+def check_account_registration_valid(values):
+    error = None
+
+    if not values['blog_title'] or len(values['blog_title']) < 1 or len(values['blog_title']) > 50:
+        error = 'Your blog title is required. (Up to 50 characters)'
+    elif not values['userid'] or len(values['userid']) < 4 or len(values['userid']) > 32:
+        error = 'User ID must have between 4 to 32 characters.'
+    elif not (values['userid'].isalnum() and values['userid'].islower()):
+        error = 'Only lowercase alphanumeric characters are allowed for User ID.'
+    elif not values['username']:
+        error = 'Username is required.'
+    elif not values['password'] or len(values['password']) < 8 or len(values['password']) > 128:
+        error = 'Password must have between 8 to 128 characters.'
+    elif not values['password_confirm'] or len(values['password_confirm']) < 8 or \
+            len(values['password_confirm']) > 128 or values['password'] != values['password_confirm']:
         error = 'Both passwords (New, Confirm) must be matched.'
     return error
 
@@ -168,7 +195,11 @@ def check_account_password_valid(user_id, values):
 def check_category_valid(name, slug, category_id=None):
     error = None
 
-    if not check_category_name_not_duplicated(name, category_id):
+    if not name or len(name) < 1 or len(name) > 32:
+        error = 'Category name is required. (Up to 32 characters)'
+    elif not slug or len(slug) < 1 or len(name) > 32:
+        error = 'Category slug is required. (Up to 32 characters)'
+    elif not check_category_name_not_duplicated(name, category_id):
         error = 'Category name must not be duplicated.'
     elif not check_category_slug_not_duplicated(slug, category_id):
         error = 'Category slug must not be duplicated.'
