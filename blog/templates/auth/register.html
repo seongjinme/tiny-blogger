@@ -1,27 +1,44 @@
 {% extends 'base.html' %}
 
-{% block title %}Register | {% endblock %}
-
 {% block nav %}
+  <title>Registration | tiny-blogger</title>
 {% endblock %}
 
 {% block header %}
 {% endblock %}
 
 {% block content %}
-  <form id="register" class="form-group" method="post" style="max-width: 25rem; margin: 0 auto;">
+  <form id="register" class="form-group mt-4" method="post" style="max-width: 25rem; margin: 0 auto;">
+    <h2>Registration</h2>
+    <hr>
+    <p class="mb-3">
+      Welcome! This is the only step to initialize <a href="https://github.com/seongjinme/tiny-blogger" title="tiny-blogger">tiny-blogger</a>.
+      Register your account infos to set up your new blog!
+    </p>
+
+    <label for="blog_title" class="mt-3">Blog title</label>
+    <input name="blog_title" id="blog_title" class="form-control form-control-lg" type="text" value="tiny-blogger" minlength="1" maxlength="50" placeholder="Enter blog title" required autofocus>
+<!--    <small class="form-text text-muted">It will be placed in the header of this blog.</small>-->
+
     <label for="userid" class="mt-3">User ID</label>
-    <input name="userid" id="userid" class="form-control form-control-lg" type="text" required autofocus>
+    <input name="userid" id="userid" class="form-control form-control-lg" type="text" minlength="4" maxlength="32" placeholder="Enter User ID" required>
+    <small class="form-text text-muted">Lowercase alphanumeric characters only. (4~32)</small>
 
     <label for="username" class="mt-3">Username</label>
-    <input name="username" id="username" class="form-control form-control-lg" type="text" required>
+    <input name="username" id="username" class="form-control form-control-lg" type="text" minlength="1" maxlength="128" placeholder="Enter Username" required>
+<!--    <small class="form-text text-muted">It will be shown as the name of author in this blog.</small>-->
 
     <label for="password" class="mt-3">Password</label>
-    <input name="password" id="password" class="form-control form-control-lg" type="password" required>
+    <input name="password" id="password" class="form-control form-control-lg" type="password" minlength="8" maxlength="128" placeholder="Password" autocomplete="false" required>
+    <small class="form-text text-muted">At least 8 or more characters are required for password.</small>
 
-    <label for="password-confirm" class="mt-3">Confirm Password</label>
-    <input name="password-confirm" id="password-confirm" class="form-control form-control-lg" type="password" required>
+    <label for="password_confirm" class="mt-3">Confirm Password</label>
+    <input name="password_confirm" id="password_confirm" class="form-control form-control-lg" minlength="8" maxlength="128" placeholder="Password" autocomplete="false" type="password" required>
 
     <button type="submit" name="submit" id="submit" class="btn btn-primary btn-lg btn-block mt-4" value="Register">Register</button>
   </form>
+
+{% endblock %}
+
+{% block footer %}
 {% endblock %}
