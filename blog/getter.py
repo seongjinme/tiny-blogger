@@ -40,7 +40,7 @@ def get_category_list():
     return category_list
 
 
-def get_category(post_id):
+def get_category_by_post_id(post_id):
     category = get_db().execute(
         'SELECT c.id, name'
         ' FROM category c JOIN post p ON c.id = p.category_id'
@@ -54,7 +54,28 @@ def get_category(post_id):
     return category
 
 
-def get_row_count(query=None):
+def get_category_by_slug(category_slug):
+    category = get_db().execute(
+        'SELECT name FROM category WHERE slug = ?',
+        (category_slug,)
+    ).fetchone()
+
+    if category is None:
+        abort(403, f"Category for this post doesn't exist.")
+
+    return category['name']
+
+
+def get_default_category():
+    category = get_db().execute('SELECT id, name, slug FROM category WHERE c_default = 1').fetchone()
+
+    if category is None:
+        abort(403, f"Category for this post doesn't exist.")
+
+    return category
+
+
+def get_row_count(query=None, category_slug=None, category_id=None):
     if query is not None:
         query = '%' + query + '%'
         rows = get_db().execute(
@@ -62,6 +83,21 @@ def get_row_count(query=None):
             ' FROM post p'
             ' WHERE title LIKE ? OR body LIKE ?',
             (query, query,)
+        ).fetchone()
+    elif category_slug is not None:
+        rows = get_db().execute(
+            'SELECT COUNT(p.id) row_count'
+            ' FROM post p'
+            ' JOIN category c ON p.category_id = c.id'
+            ' WHERE c.slug = ?',
+            (category_slug,)
+        ).fetchone()
+    elif category_id is not None:
+        rows = get_db().execute(
+            'SELECT COUNT(p.id) row_count'
+            ' FROM post p'
+            ' WHERE category_id = ?',
+            (category_id,)
         ).fetchone()
     else:
         rows = get_db().execute(
@@ -72,7 +108,7 @@ def get_row_count(query=None):
     return rows['row_count']
 
 
-def get_pagination_ranges(page=None, query=None):
+def get_pagination_ranges(page=None, query=None, category_slug=None):
     # Set variables for pagination
     db = get_db()
     values = db.execute(
@@ -87,7 +123,7 @@ def get_pagination_ranges(page=None, query=None):
     page = 1 if page is None or page <= 1 else page
 
     # Get page info and post counts to initiate pagination
-    row_count = get_row_count(query)
+    row_count = get_row_count(query, category_slug)
     offset = (page - 1) * posts_per_page if (page - 1) >= 0 else 0
     pages = (row_count // posts_per_page) + 1 if row_count % posts_per_page else row_count // posts_per_page
 
@@ -133,8 +169,19 @@ def get_posts_per_page_by_search(query_string, offset, per_page):
     ).fetchall()
 
 
-def get_posts_per_page(offset, per_page):
+def get_posts_per_page(offset, per_page, category_slug=None):
     db = get_db()
+    if category_slug:
+        return db.execute(
+            'SELECT p.id, c.name c_name, c.slug c_slug, title, p.slug slug, body, created, user_id, username'
+            ' FROM post p'
+            ' JOIN user u ON p.user_id = u.id'
+            ' JOIN category c ON p.category_id = c.id'
+            ' WHERE c.slug = ?'
+            ' ORDER BY created DESC'
+            ' LIMIT ?, ?',
+            (category_slug, offset, per_page,)
+        ).fetchall()
     return db.execute(
         'SELECT p.id, c.name c_name, c.slug c_slug, title, p.slug slug, body, created, user_id, username'
         ' FROM post p'

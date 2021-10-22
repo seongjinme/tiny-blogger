@@ -15,8 +15,8 @@ def check_category_exists():
     # If there's no category, create default category named "Uncategorized"
     if db.execute('SELECT id FROM category').fetchone() is None:
         db.execute(
-            'INSERT INTO category (name, slug, c_order) VALUES (?, ?, ?)',
-            ('Uncategorized', 'uncategorized', 1)
+            'INSERT INTO category (name, slug, c_order, c_default) VALUES (?, ?, ?, ?)',
+            ('Uncategorized', 'uncategorized', 1, 1)
         )
         db.commit()
 
@@ -93,7 +93,7 @@ def check_category_name_not_duplicated(name, category_id=None):
     return False
 
 
-def check_category_valid(category_id):
+def check_category_id_exists(category_id):
     db = get_db()
     category = db.execute(
         'SELECT id, name FROM category WHERE id = ?',
@@ -112,7 +112,7 @@ def check_input_valid(title, slug, body, post_id, category_id):
         error = 'Post URL Slug is required. (Up to 200 characters)'
     elif not check_slug_valid(slug):
         error = 'Blank spaces, special chars except hyphen(-) are not allowed for Post URL slug. (Up to 200 characters)'
-    elif not check_category_valid(category_id):
+    elif not check_category_id_exists(category_id):
         error = 'Valid category must be selected.'
     elif not check_post_slug_not_duplicated(post_id, slug):
         error = 'Post URL Slug is duplicated.'
@@ -156,15 +156,17 @@ def check_account_password_valid(user_id, values):
     return error
 
 
-def check_category_not_duplicated(name, slug, category_id=None):
+def check_category_valid(name, slug, category_id=None):
     error = None
 
     if not check_category_name_not_duplicated(name, category_id):
         error = 'Category name must not be duplicated.'
     elif not check_category_slug_not_duplicated(slug, category_id):
         error = 'Category slug must not be duplicated.'
-    elif slug == 'admin' or slug == 'auth' or slug == 'about':
-        error = 'Using preserved slug is not allowed. (admin, auth, about)'
+    elif slug == 'admin' or slug == 'auth' or slug == 'about' or slug == 'create':
+        error = 'Using preserved slug is not allowed. (admin, auth, about, create)'
+    elif not check_slug_valid(slug):
+        error = 'Blank spaces, special chars except hyphen(-) are not allowed for category slug.'
     return error
 
 
@@ -172,9 +174,14 @@ def check_category_ids_valid(category_ids):
     error = None
     db = get_db()
 
-    for category_id in category_ids:
-        if db.execute('SELECT id FROM category WHERE id = ?', (category_id,)).fetchone() is None:
+    if hasattr(category_ids, '__iter__'):
+        for category_id in category_ids:
+            if db.execute('SELECT id FROM category WHERE id = ?', (category_id,)).fetchone() is None:
+                error = 'Some information of category is not valid. Please try again.'
+                break
+
+    else:
+        if db.execute('SELECT id FROM category WHERE id = ?', (category_ids,)).fetchone() is None:
             error = 'Some information of category is not valid. Please try again.'
-            break
 
     return error
