@@ -29,7 +29,7 @@
 
         <div class="col-6 mb-3">
           <label for="username">Username</label>
-          <input name="username" id="username" class="form-control" type="text" value="{{ account['username'] }}" minlength="1" maxlength="255" required>
+          <input name="username" id="username" class="form-control" type="text" value="{{ account['username'] }}" placeholder="Enter Username" minlength="1" maxlength="255" required>
           <div class="invalid-tooltip">
             Username must have 1~255 characters.
           </div>
@@ -44,21 +44,21 @@
       <div class="form-row">
         <div class="col-6 mb-3">
           <label for="pw_current">Current password</label>
-          <input name="pw_current" id="pw_current" class="form-control" type="password" minlength="8" maxlength="255" autocomplete="false" required>
+          <input name="pw_current" id="pw_current" class="form-control" type="password" minlength="8" maxlength="255" placeholder="Enter password" autocomplete="false" required>
         </div>
       </div>
 
       <div class="form-row">
         <div class="col-6 mb-3">
           <label for="pw_new">New password</label>
-          <input name="pw_new" id="pw_new" class="form-control" type="password" minlength="8" maxlength="255" autocomplete="false" required>
+          <input name="pw_new" id="pw_new" class="form-control" type="password" minlength="8" maxlength="255" placeholder="Enter new password" autocomplete="false" required>
           <div class="invalid-tooltip">
             Password must have 8~255 characters.
           </div>
         </div>
         <div class="col-6 mb-3">
           <label for="pw_new_confirm">Confirm password</label>
-          <input name="pw_new_confirm" id="pw_new_confirm" class="form-control" type="password" minlength="8" maxlength="255" autocomplete="false" required>
+          <input name="pw_new_confirm" id="pw_new_confirm" class="form-control" type="password" minlength="8" maxlength="255" placeholder="Confirm new password" autocomplete="false" required>
           <div class="invalid-tooltip">
             Must be same with new password.
           </div>

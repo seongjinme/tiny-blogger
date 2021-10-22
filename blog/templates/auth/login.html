@@ -6,12 +6,12 @@
 {% endblock %}
 
 {% block content %}
-  <form id="login" class="form-group" method="post" style="max-width: 25rem; margin: 0 auto;">
+  <form id="login" class="form-group" method="post" style="max-width: 25rem; margin: 0 auto 3rem;">
     <label for="userid" class="mt-3">User ID</label>
-    <input name="userid" id="userid" class="form-control form-control-lg" type="text" autocomplete="false" required autofocus>
+    <input name="userid" id="userid" class="form-control form-control-lg" type="text" autocomplete="false" minlength="4" maxlength="32" placeholder="Enter User ID" required autofocus>
 
     <label for="password" class="mt-3">Password</label>
-    <input name="password" id="password" class="form-control form-control-lg" type="password" autocomplete="false" required>
+    <input name="password" id="password" class="form-control form-control-lg" type="password" autocomplete="false" placeholder="Password" minlength="8" maxlength="128" required>
 
     <button type="submit" name="submit" id="submit" class="btn btn-primary btn-lg btn-block mt-4" value="Login">Login</button>
   </form>

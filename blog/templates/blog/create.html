@@ -22,7 +22,7 @@
     <label for="slug" class="mt-3">Post URL slug</label>
     <span class="text-primary" data-toggle="tooltip" data-placement="right" title="Blank spaces, special chars except hyphen(-) are not allowed.">(?)</span>
     <div class="input-group">
-      <input name="slug" id="slug" class="form-control" type="text" value="{{ request.form['slug'] }}" maxlength="200" required readonly>
+      <input name="slug" id="slug" class="form-control" type="text" value="{{ request.form['slug'] }}" maxlength="200" placeholder="Enter URL slug" required readonly>
       <div class="input-group-append">
         <button type="button" form="create" name="btn_edit_slug" id="btn_edit_slug" class="btn btn-primary" value="Edit" disabled>Edit</button>
       </div>
