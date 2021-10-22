@@ -1,15 +1,14 @@
 from flask import (
-    Blueprint, flash, redirect, render_template, request, session, url_for, jsonify
+    Blueprint, flash, redirect, render_template, request, session, url_for
 )
 from werkzeug.security import generate_password_hash
 from blog.auth import login_required
 from blog.db import get_db
 from blog.checker import (
     check_settings_valid, check_account_username_valid, check_account_password_valid,
-    check_category_not_duplicated, check_category_ids_valid
+    check_category_valid, check_category_ids_valid
 )
-from blog.getter import get_blog_title, get_category_list
-import json
+from blog.getter import get_blog_title, get_category_list, get_default_category, get_row_count
 
 bp = Blueprint('admin', __name__, url_prefix='/admin')
 
@@ -30,14 +29,12 @@ def settings():
             flash(error)
         else:
             posts_truncate = 1 if request.form.get('posts_truncate') == 'on' else 0
-            search_allow = 1 if request.form.get('search_allow') == 'on' else 0
 
             db = get_db()
             db.execute(
                 'UPDATE setting'
-                ' SET blog_title = ?, posts_per_page = ?, pagination_size = ?, posts_truncate = ?, search_allow = ?',
-                (values['blog_title'], values['posts_per_page'], values['pagination_size'],
-                 posts_truncate, search_allow)
+                ' SET blog_title = ?, posts_per_page = ?, pagination_size = ?, posts_truncate = ?',
+                (values['blog_title'], values['posts_per_page'], values['pagination_size'], posts_truncate)
             )
             db.commit()
             flash('Settings have successfully changed!')
@@ -107,18 +104,31 @@ def categories():
     db = get_db()
 
     if request.method == 'POST':
-        if 'create_category_name' in request.form:
+        if 'select_default_category' in request.form:
+            category_id = int(request.form['select_default_category'])
+            error = check_category_ids_valid(category_id)
+            if error is not None:
+                flash(error)
+            else:
+                db.execute('UPDATE category SET c_default = 0')
+                db.commit()
+                db.execute('UPDATE category SET c_default = 1 WHERE id = ?', (category_id,))
+                db.commit()
+                flash('Default category has successfully saved!')
+                return redirect(url_for('admin.categories'))
+
+        elif 'create_category_name' in request.form:
             name = request.form['create_category_name']
             slug = request.form['create_category_slug']
-            error = check_category_not_duplicated(name, slug)
+            error = check_category_valid(name, slug)
             if error is not None:
                 flash(error)
             else:
                 c_order = db.execute('SELECT MAX(c_order) max FROM category').fetchone()
                 db.execute(
-                    'INSERT INTO category (name, slug, c_order)'
-                    ' VALUES (?, ?, ?)',
-                    (name, slug, c_order['max'] + 1)
+                    'INSERT INTO category (name, slug, c_order, c_default)'
+                    ' VALUES (?, ?, ?, ?)',
+                    (name, slug, c_order['max'] + 1, 0)
                 )
                 db.commit()
                 flash('New category has successfully created!')
@@ -128,7 +138,7 @@ def categories():
             name = request.form['edit_category_name']
             slug = request.form['edit_category_slug']
             category_id = int(request.form['edit_category_id'])
-            error = check_category_not_duplicated(name, slug, category_id)
+            error = check_category_valid(name, slug, category_id)
             if error is not None:
                 flash(error)
             else:
@@ -143,12 +153,16 @@ def categories():
 
         elif 'delete_category_id' in request.form:
             category_lists = db.execute('SELECT COUNT(id) count FROM category').fetchone()
+            category_id = int(request.form['delete_category_id'])
+            category_name = request.form['delete_category_name']
+
             if category_lists['count'] <= 1:
                 error = "There should be at least one category in the blog."
                 flash(error)
+            elif category_id == get_default_category()['id']:
+                error = "Deleting default category is not allowed. Try after changing default category."
+                flash(error)
             else:
-                category_id = int(request.form['delete_category_id'])
-                category_name = request.form['delete_category_name']
                 category_exists = db.execute(
                     'SELECT id, name FROM category'
                     ' WHERE id = ? AND name = ?', (category_id, category_name,)
@@ -157,13 +171,18 @@ def categories():
                     error = "There's no matching category information. Please try again."
                     flash(error)
                 else:
+                    rows = get_row_count(None, None, category_id)
+                    if rows > 0:
+                        db.execute(
+                            'UPDATE post SET category_id = ? WHERE category_id = ?',
+                            (get_default_category()['id'], category_id)
+                        )
                     db.execute('DELETE FROM category WHERE id = ?', (category_id,))
                     db.commit()
                     flash(f"Category '{category_name}' has successfully deleted!")
                     return redirect(url_for('admin.categories'))
 
         elif 'sort_category_order' in request.form:
-
             c_ids = list(map(int, request.form['sort_category_order'].split(',')))
 
             error = check_category_ids_valid(c_ids)
@@ -182,7 +201,7 @@ def categories():
 
     if error:
         return render_template('admin/categories.html', blog_title=get_blog_title(), categories=get_category_list(),
-                               alarm_type='danger', current='categories')
+                               default_category=get_default_category(), alarm_type='danger', current='categories')
 
     return render_template('admin/categories.html', blog_title=get_blog_title(), categories=get_category_list(),
-                           alarm_type='success', current='categories')
+                           default_category=get_default_category(), alarm_type='success', current='categories')
