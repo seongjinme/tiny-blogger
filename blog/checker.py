@@ -121,6 +121,15 @@ def check_input_valid(title, slug, body, post_id, category_id):
     return error
 
 
+def check_about_input_valid(title, body):
+    error = None
+    if not title:
+        error = 'Title is required. (Up to 100 characters)'
+    elif not body:
+        error = 'Body is required.'
+    return error
+
+
 def check_settings_valid(values):
     error = None
     if not values['blog_title'] or len(values['blog_title']) < 1 or len(values['blog_title']) > 50:

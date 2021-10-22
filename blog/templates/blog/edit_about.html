@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block head %}
+  {{ super() }}
+  <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.15/dist/summernote-bs4.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.15/dist/summernote-bs4.min.js"></script>
+  <script>
+    /* Enable tooltips in bootstrap */
+    $(function () {
+      $('[data-toggle="tooltip"]').tooltip()
+    })
+  </script>
+{% endblock %}
+
+{% block content %}
+  <form id="create" class="form-group" method="post">
+    <label for="title" class="mt-3">Title</label>
+    <input name="title" id="title" class="form-control form-control-lg" type="text" value="{{ request.form['title'] or post['title'] }}" placeholder="Enter title" maxlength="100" required autofocus>
+
+    <label for="summernote" class="mt-3">Body</label>
+    <textarea name="body" id="summernote" class="form-control" form="create">{{ request.form['body'] or post['body'] }}</textarea>
+    <script>
+      $('#summernote').summernote({
+        placeholder: 'Enter some content here.',
+        tabsize: 2,
+        height: 250,
+        prettifyHtml:false,
+        codeviewFilter: true,
+        codeviewIframeFilter: true,
+        toolbar:[
+          ['style', ['style']],
+          ['font', ['bold', 'italic', 'underline', 'clear']],
+          ['color', ['forecolor']],
+          ['para', ['ul', 'ol', 'paragraph']],
+          ['insert', ['link', 'picture', 'video', 'hr']],
+          ['highlight', ['highlight']],
+          ]
+      });
+    </script>
+    <button type="submit" name="submit" id="submit" class="btn btn-primary btn-lg btn-block mt-4" value="Submit">Submit</button>
+  </form>
+{% endblock %}

@@ -27,6 +27,18 @@ def get_post(slug, check_author=True):
     return post
 
 
+def get_about():
+    post = get_db().execute(
+        'SELECT blog_about_title title, blog_about_body body'
+        ' FROM setting'
+    ).fetchone()
+
+    if post is None:
+        abort(404, f"'About' page doesn't exist.")
+
+    return post
+
+
 def get_category_list():
     category_list = get_db().execute(
         'SELECT id, name, slug'

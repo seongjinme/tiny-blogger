@@ -4,11 +4,12 @@ from flask import (
 from blog.auth import login_required
 from blog.db import get_db
 from blog.checker import (
-    check_input_valid, check_user_exists, check_category_exists, check_setting_exists
+    check_input_valid, check_user_exists, check_category_exists, check_setting_exists, check_about_input_valid
 )
 from blog.getter import (
     get_blog_title, get_post, get_category_by_post_id, get_category_by_slug, get_default_category,
     get_category_list, get_pagination_ranges, get_posts_per_page, get_posts_per_page_by_search,
+    get_about
 )
 from blog.sanitize import sanitize_html
 import re
@@ -81,14 +82,14 @@ def index():
             query_keyword = query
             query = None
             page = 1
-            error = f'Theres no search results with keyword : {query_keyword}'
+            flash(f'Theres no search results with keyword : {query_keyword}')
 
     # Case 2 : If there's a 'blank' query, ignore query & page number, and render index with a message
     elif query is not None and query == '':
         posts = get_posts_per_page(p['offset'], p['posts_per_page'])
         query = None
         page = 1
-        error = "Search with blank spaces and blank keyword is not supported."
+        flash("Search with blank spaces and blank keyword is not allowed.")
 
     # Case 3 : In case if there's no query
     else:
@@ -273,3 +274,35 @@ def delete(category_slug, slug):
     db.commit()
     flash('Your post has successfully deleted!')
     return redirect(url_for('blog.index'))
+
+
+@bp.route('/about')
+def about():
+    post = get_about()
+    return render_template('blog/about.html', blog_title=get_blog_title(), post=post,
+                           categories=get_category_list())
+
+
+@bp.route('/about/edit', methods=('GET', 'POST'))
+@login_required
+def edit_about():
+    post = get_about()
+
+    if request.method == 'POST':
+        title = request.form['title']
+        body = request.form['body']
+
+        error = check_about_input_valid(title, body)
+        if error is not None:
+            flash(error)
+        else:
+            db = get_db()
+            db.execute(
+                'UPDATE setting SET blog_about_title = ?, blog_about_body = ?',
+                (title, body)
+            )
+            db.commit()
+            flash("Your 'About' page has successfully updated!")
+            return redirect(url_for('blog.about'))
+
+    return render_template('blog/edit_about.html', blog_title=get_blog_title(), post=post, alarm_type='danger')
