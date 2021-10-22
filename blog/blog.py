@@ -7,7 +7,8 @@ from blog.checker import (
     check_input_valid, check_user_exists, check_category_exists, check_setting_exists
 )
 from blog.getter import (
-    get_blog_title, get_post, get_category, get_category_list, get_pagination_ranges, get_posts_per_page, get_posts_per_page_by_search
+    get_blog_title, get_post, get_category_by_post_id, get_category_by_slug, get_default_category,
+    get_category_list, get_pagination_ranges, get_posts_per_page, get_posts_per_page_by_search,
 )
 from blog.sanitize import sanitize_html
 import re
@@ -105,7 +106,7 @@ def index():
                 page = 1
                 error = "Page number is out of range."
 
-        # Case 3-2 : If there's no post at all, render an alarm message only
+        # Case 3-2 : If there's no post at all, render an message
         else:
             flash("There is no post yet. Why don't you start blogging now? :)")
             posts = None
@@ -122,8 +123,81 @@ def index():
                            p_num_start=p_num_start, p_num_end=p_num_end, posts_truncate=posts_truncate)
 
 
-@bp.route('/<string:slug>/')
-def view_post(slug):
+@bp.route('/<string:category_slug>/', methods=('GET',))
+def index_category(category_slug):
+    # If there's no registered user, redirect to register page
+    if not check_user_exists():
+        return redirect(url_for('auth.register'))
+
+    # Check if there's at least one category
+    check_category_exists()
+
+    # Check if there are valid setting values
+    check_setting_exists()
+
+    error = None
+
+    if get_db().execute('SELECT id FROM category WHERE slug = ?', (category_slug,)).fetchone() is None:
+        error = 'URL path is invalid.'
+        flash(error)
+        return redirect(url_for('blog.index'))
+
+    # Get query keywords and strip
+    query = request.args.get('q')
+    if query:
+        query = re.sub(r'(-)\1+', '-', query)
+        query = re.sub(r'(\s)\1+', ' ', query)
+        query = query.strip()
+
+    # Get page info to initiate pagination
+    page = request.args.get('p', 1, type=int)
+    p = get_pagination_ranges(page, None, category_slug)
+
+    # Set the rest variables for rendering index with default values
+    pages = p['pages']
+    p_num_start = p['pagination_num_start']
+    p_num_end = p['pagination_num_end']
+    posts_truncate = p['posts_truncate']
+
+    # If there's a query, redirect to index and run searching
+    if query is not None:
+        return redirect(url_for('blog.index', q=query))
+
+    # Start rendering index_category
+    # Case 1 : If there's at least 1 or more posts, start rendering index
+    if p['row_count'] > 0:
+
+        # Case 1-1 : If there's a page number and it's correct, render index as usual
+        if 1 <= page <= p['pages']:
+            posts = get_posts_per_page(p['offset'], p['posts_per_page'], category_slug)
+
+        # Case 1-2 : If there's a page number but it's out of range
+        else:
+            posts = get_posts_per_page(0, p['posts_per_page'], category_slug)
+            page = 1
+            error = "Page number is out of range."
+
+    # Case 2 : If there's no post at all, render an message
+    else:
+        flash("There is no post with this category yet. Why don't you start blogging now? :)")
+        posts = None
+        page = 1
+
+    if error:
+        flash(error)
+        return render_template('blog/index.html', blog_title=get_blog_title(), categories=get_category_list(),
+                               posts=posts, query=query, page=page, pages=pages, alarm_type='danger',
+                               p_num_start=p_num_start, p_num_end=p_num_end, posts_truncate=posts_truncate,
+                               index_category=get_category_by_slug(category_slug), index_category_slug=category_slug)
+
+    return render_template('blog/index.html', blog_title=get_blog_title(), categories=get_category_list(),
+                           posts=posts, query=query, page=page, pages=pages,
+                           p_num_start=p_num_start, p_num_end=p_num_end, posts_truncate=posts_truncate,
+                           index_category=get_category_by_slug(category_slug), index_category_slug=category_slug)
+
+
+@bp.route('/<string:category_slug>/<string:slug>/')
+def view_post(category_slug, slug):
     post = get_post(slug, False)
     return render_template('blog/post.html', blog_title=get_blog_title(), post=post,
                            categories=get_category_list())
@@ -154,12 +228,12 @@ def create():
             return redirect(url_for('blog.index'))
 
     return render_template('blog/create.html', blog_title=get_blog_title(), alarm_type='danger',
-                           categories=get_category_list())
+                           default_category=get_default_category(), categories=get_category_list())
 
 
-@bp.route('/<string:slug>/edit', methods=('GET', 'POST'))
+@bp.route('/<string:category_slug>/<string:slug>/edit', methods=('GET', 'POST'))
 @login_required
-def edit(slug):
+def edit(category_slug, slug):
     post = get_post(slug)
 
     if request.method == 'POST':
@@ -187,12 +261,12 @@ def edit(slug):
             return redirect(url_for('blog.index'))
 
     return render_template('blog/edit.html', blog_title=get_blog_title(), post=post, alarm_type='danger',
-                           category=get_category(post['id']), categories=get_category_list())
+                           category=get_category_by_post_id(post['id']), categories=get_category_list())
 
 
-@bp.route('/<string:slug>/delete', methods=('POST',))
+@bp.route('/<string:category_slug>/<string:slug>/delete', methods=('POST',))
 @login_required
-def delete(slug):
+def delete(category_slug, slug):
     get_post(slug)
     db = get_db()
     db.execute('DELETE FROM post WHERE slug = ?', (slug,))
