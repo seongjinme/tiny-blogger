@@ -1,25 +1,20 @@
 import os
 from flask import Flask
+from instance.config import *
 
 
 def create_app(test_config=None):
-    # create app instance
     app = Flask(__name__, instance_relative_config=True)
-    app.config.from_mapping(
-        # set SECRET_KEY='dev' for dev mode only
-        SECRET_KEY='dev',
-        DATABASE=os.path.join(app.instance_path, 'blog.sqlite')
-    )
 
     if test_config is None:
-        # read the instance config, if it exists, when not testing
-        app.config.from_pyfile('config.py', silent=True)
+        if os.environ.get('FLASK_ENV') == 'production':
+            app.config.from_object(ProductionConfig)
+        elif os.environ.get('FLASK_ENV') == 'development':
+            app.config.from_object(DevelopmentConfig)
 
     else:
-        # load the test config if passed in
-        app.config.from_mapping(test_config)
+        app.config.from_object(TestingConfig)
 
-    # ensure the instance folder exists
     try:
         os.makedirs(app.instance_path)
     except OSError:
