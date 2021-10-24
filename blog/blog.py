@@ -313,4 +313,5 @@ def edit_about():
             flash("Your 'About' page has successfully updated!")
             return redirect(url_for('blog.about'))
 
-    return render_template('blog/edit_about.html', blog_info=get_blog_info(), post=post, alarm_type='danger')
+    return render_template('blog/edit_about.html', blog_info=get_blog_info(), post=post, alarm_type='danger',
+                           categories=get_category_list())
