@@ -25,6 +25,7 @@
 {% endblock %}
 
 {% block content %}
+{% if posts %}
   {% for post in posts %}
     <article class="post">
       <header>
@@ -50,6 +51,7 @@
       <hr>
     {% endif %}
   {% endfor %}
+{% endif %}
 
   <nav id="pagination" class="mt-5 mb-5" style="margin: 0 auto; padding: 0 auto;">
     <ul class="pagination">
