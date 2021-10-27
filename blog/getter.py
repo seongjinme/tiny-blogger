@@ -132,7 +132,7 @@ def get_pagination_ranges(page=None, query=None, category_slug=None):
     ).fetchone()
     posts_per_page = values['posts_per_page']  # default: 3, min: 1, max: 20
     pagination_size = values['pagination_size']  # default: 5, min: 3, max: 10
-    posts_truncate = True if values['pagination_size'] == 1 else False  # default: True
+    posts_truncate = True if values['posts_truncate'] == 1 else False  # default: True
 
     # Ensure page is higher than 0
     page = 1 if page is None or page <= 1 else page
