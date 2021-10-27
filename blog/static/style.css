@@ -15,3 +15,17 @@ span#post_slug {
 .body {
     margin: 1rem 0;
 }
+
+pre {
+    display: block;
+    padding: 1.5rem;
+    background-color: #EAEAEA;
+    border-radius: 0.5rem;
+}
+
+code {
+    border: 1px solid #e83e8c;
+    padding: 0.2em 0.3em;
+    margin: 0 0.3em;
+    border-radius: 0.3em;
+}
