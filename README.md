@@ -1,6 +1,6 @@
 # tiny-blogger
 
-<div align="center"><img src="https://github.com/seongjinme/tiny-blogger/blob/master/docs/images/mockup.png" width="50%" alt="tiny-blogger header img"></div>
+<div align="center"><img src="https://github.com/seongjinme/tiny-blogger/blob/master/docs/images/mockup.png" alt="tiny-blogger header img"></div>
 
 **tiny-blogger** is a python web application for personal blogging based on the basic structure of [Flaskr](https://flask.palletsprojects.com/en/2.0.x/tutorial/index.html); an official tutorial project of [Flask](https://flask.palletsprojects.com/). As an extension of [Flaskr](https://flask.palletsprojects.com/en/2.0.x/tutorial/index.html), **tiny-blogger** provides many useful features for blogging with simple and yet convenient UI.
 
