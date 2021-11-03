@@ -79,8 +79,10 @@ That’s it! Now you can access to your blog via `http://[VM_INTERNAL_IP:5000]` 
 
 * Python 3.8
 * Flask 2.0.2
-* Bleach 4.1.0
+* jQuery 3.6.0
+* jQuery UI 1.13.0
 * Bootstrap 4.6.0
+* Bleach 4.1.0
 * Summernote 0.8.18
 
 ## Note
