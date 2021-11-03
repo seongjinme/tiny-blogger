@@ -65,12 +65,12 @@ If you’re using Docker Engine, you can download and run **tiny-blogger** conta
 #### Background mode
 
 ```shell
-$ docker run -d -p 80:5000 —name tiny-blogger seongjinme/tiny-blogger:1.0
+$ docker run -d -p 80:5000 --name tiny-blogger seongjinme/tiny-blogger:1.0
 ```
 
 #### Foreground mode with tty
 ```shell
-$ docker run -it -p 80:5000 —name tiny-blogger seongjinme/tiny-blogger:1.0
+$ docker run -it -p 80:5000 --name tiny-blogger seongjinme/tiny-blogger:1.0
 ```
 
 That’s it! Now you can access to your blog via `http://[VM_INTERNAL_IP:5000]` or `http://[VM_EXTERNAL_IP]`.
